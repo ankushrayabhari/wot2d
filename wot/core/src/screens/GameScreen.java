@@ -22,8 +22,9 @@ import tank.Tank;
 
 public class GameScreen extends ScreenAdapter {
 
-    private final float forceMultiplier = 20;
-    private final float pixels_per_meter = 100;
+    private final float forceMultiplier = 10;
+    private final float pixels_per_meter = 50;
+    private final float kfriction = 0.3f;
     
     private WorldOfTanks game;
     private SpriteBatch batch;
@@ -36,7 +37,7 @@ public class GameScreen extends ScreenAdapter {
     public GameScreen(WorldOfTanks t) {
         game = t;
         batch = new SpriteBatch();
-        img = new Texture("badlogic.jpg");
+        img = new Texture("data/t34full.png");
         sprite = new Sprite(img);
         input = new DesktopInput(t);
         Gdx.input.setInputProcessor(input);
@@ -76,6 +77,12 @@ public class GameScreen extends ScreenAdapter {
     private void updateWorld(float delta) {
         body.applyForceToCenter(input.getForce().getX() * forceMultiplier, 
                 input.getForce().getY() * forceMultiplier, true);
+        if (!body.getLinearVelocity().isZero()) {
+            body.applyForceToCenter(- body.getLinearVelocity().x * 
+                    body.getMass() * 9.8f * kfriction, 
+                    - body.getLinearVelocity().y * body.getMass() * 
+                    9.8f * kfriction, true);
+        }
         world.step(delta, 6, 2);
     }
 
