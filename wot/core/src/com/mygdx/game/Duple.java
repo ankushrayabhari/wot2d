@@ -1,10 +1,10 @@
 package com.mygdx.game;
 
-public class Force {
+public class Duple {
 
     private float Fx, Fy;
 
-    public Force(float x, float y) {
+    public Duple(float x, float y) {
         Fx = x;
         Fy = y;
     }
@@ -15,5 +15,13 @@ public class Force {
 
     public float getY() {
         return Fy;
+    }
+    
+    public void setX(float x) {
+        Fx = x;
+    }
+    
+    public void setY(float y) {
+        Fy = y;
     }
 }
