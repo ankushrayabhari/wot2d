@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
@@ -24,7 +25,7 @@ public class DesktopInput extends InputAdapter {
         tanks = t;
     }
     
-    public Duple getDirection() {
+    public Duple getWasdDirection() {
         float xDirection = 0, yDirection = 0;
 
         if (isKeyPressed[0]) {
@@ -41,9 +42,28 @@ public class DesktopInput extends InputAdapter {
         }
         return new Duple(xDirection, yDirection);
     }
+    
+    public float getMouseAngleInRad() {
+        float dX = Gdx.input.getX() - Gdx.graphics.getWidth() / 2;
+        float dY = Gdx.graphics.getHeight() / 2 - Gdx.input.getY();
+        if (dX == 0) {
+            if (dY < 0) {
+                return (float) (Math.PI * 3f / 2);
+            } else if (dY > 0) {
+                return (float) (Math.PI / 2);
+            } else {
+                return -1;
+            }
+        }
+        float angle = (float) (Math.atan2(dY, dX));
+        while (angle < 0) {
+            angle += (float) Math.PI * 2;
+        }
+        return angle %= (float) (Math.PI * 2);
+    }
 
     public Duple getForceDirection() {
-        Duple duple = getDirection();
+        Duple duple = getWasdDirection();
         if (isKeyPressed[0] && isKeyPressed[1]) {
             duple.setX((float) (duple.getX() / Math.sqrt(2)));
             duple.setY((float) (duple.getY() / Math.sqrt(2)));
@@ -61,37 +81,48 @@ public class DesktopInput extends InputAdapter {
         return duple;
     }
     
-    public boolean closeAngle(float angleInDegrees) {
-        Duple duple = getDirection();
+    public boolean closeAngle(float angleInDegrees, boolean isWasd) {
         float angle;
-        if (duple.getX() == 0 && duple.getY() == 1) {
-            angle = Math.abs(angleInDegrees - 90);
-        } else if (duple.getX() == 0 && duple.getY() == -1) {
-            angle = Math.abs(angleInDegrees - 270);
+        if (isWasd) {
+            Duple duple = getWasdDirection();
+            if (duple.getX() == 0 && duple.getY() == 1) {
+                angle = Math.abs(angleInDegrees - 90);
+            } else if (duple.getX() == 0 && duple.getY() == -1) {
+                angle = Math.abs(angleInDegrees - 270);
+            } else {
+                angle = (float) Math.abs(angleInDegrees - 
+                        Math.toDegrees(Math.atan2(duple.getY(), duple.getX())));
+            }
+            if (angle < 35) {
+                return true;
+            }
+            return false;
         } else {
-            angle = (float) Math.abs(angleInDegrees - 
-                    Math.toDegrees(Math.atan2(duple.getY(), duple.getX())));
+            angle = getMouseAngleInRad();
+            if (Math.abs(Math.toRadians(angle - angleInDegrees)) < 35) {
+                return true;
+            }
+            return false;
         }
-        if (angle < 35) {
-            return true;
-        }
-        return false;
     }
 
-    public float getTorqueDirection(float angleInDegrees) {
-        float currentAngle = (angleInDegrees + 360) % 360;
-        Duple duple = getDirection();
-        float angle;
-        if (duple.getX() == 0 && duple.getY() == 1) {
-            angle = Math.abs(angleInDegrees - 90);
-        } else if (duple.getX() == 0 && duple.getY() == -1) {
-            angle = Math.abs(angleInDegrees - 270);
-        } else {
-            angle = (float) Math.abs(angleInDegrees - 
-                    Math.toDegrees(Math.atan2(duple.getY(), duple.getX())));
+    public float getWasdTorqueDirection(float angleInDegrees) {
+        while (angleInDegrees < 0) {
+            angleInDegrees += 360;
         }
-//        System.out.println(angleInDegrees + " " + angle);
-        //TODO rare directional bug
+        float currentAngle = angleInDegrees % 360;
+        Duple duple = getWasdDirection();
+        // TODO does the bug still exist
+//        float angle;
+//        if (duple.getX() == 0 && duple.getY() == 1) {
+//            angle = Math.abs(angleInDegrees - 90);
+//        } else if (duple.getX() == 0 && duple.getY() == -1) {
+//            angle = Math.abs(angleInDegrees - 270);
+//        } else {
+//            angle = (float) Math.abs(angleInDegrees - 
+//                    Math.toDegrees(Math.atan2(duple.getY(), duple.getX())));
+//        }
+//        System.out.println(currentAngle + " " + angle);
         if (duple.getX() != 0) {
             if (Math.abs(currentAngle - 
                     Math.toDegrees(Math.atan2(duple.getY(), 
