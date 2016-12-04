@@ -1,0 +1,5 @@
+F_S_R 51 38 38 //front side and rear armor
+HPT_MF_MB 11.78 48 18 //horsepower per ton, max forward speed, max reverse speed
+RH_RT_HP: 35 39 400 //rotate speed hull, rotate speed turret, health (rotate speed in degrees/second)
+Dmg_Pen_RoF: 110 92 16 //damage, penetration, rate of fire
+Acc_Aim_View: 0.46 2.1 330 //accuracy, aiming time in seconds, view range in meters
