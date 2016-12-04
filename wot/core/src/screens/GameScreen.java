@@ -150,11 +150,15 @@ public class GameScreen extends ScreenAdapter {
         if (aimingAngle < 0) {
             return 0;
         }
-        float currentAngle = body.getAngle();
-        while (currentAngle < 0) {
-            currentAngle += (float) Math.PI * 2;
+        while (body.getAngle() < 0) {
+            body.setTransform(body.getPosition(), body.getAngle() + (float) 
+                    (Math.PI * 2));
         }
-//        System.out.println(Math.toDegrees(aimingAngle) + " " + Math.toDegrees(currentAngle));
+        if (body.getAngle() >= Math.PI * 2) {
+            body.setTransform(body.getPosition(), body.getAngle() % (float) 
+                    (Math.PI * 2));
+        }
+        float currentAngle = body.getAngle();
         if (aimingAngle - currentAngle > 0 && aimingAngle - currentAngle <= Math.PI) {
             return 1;
         } else if (currentAngle - aimingAngle > 0 && currentAngle - aimingAngle >= Math.PI) {
