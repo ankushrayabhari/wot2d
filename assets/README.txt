@@ -1,0 +1,1 @@
+Copy these folders into wot/desktop/bin (Git does not track changes in that folder so these files are to be moved manually)

@@ -17,27 +17,28 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.DesktopInput;
-import com.mygdx.game.Duple;
 import com.mygdx.game.WorldOfTanks;
 
-import tank.Tank;
+import map.Map;
+import tank.TankReader;
 
 public class GameScreen extends ScreenAdapter {
 
-    private final float forceMultiplier = 6;
-    private final float torqueMultiplier = 0.6f;
+    private final float forceMultiplier = 12; // actual gameplay value = 6
+    private final float torqueMultiplier = 0.3f;
     private final float pixels_per_meter = 50;
     private final float kFriction = 0.45f;
     private final float torqueFriction = 0.15f;
     
     private WorldOfTanks game;
     private SpriteBatch batch;
-    private Sprite hullSprite, turretSprite, backgroundSprite;
-    private Texture hullImg, turretImg, backgroundImg;
+    private Sprite hullSprite, turretSprite;
+    private Texture hullImg, turretImg;
     private World world;
     private Body hull, turret;
     private DesktopInput input;
     private OrthographicCamera camera;
+    private Map map;
 
     public GameScreen(WorldOfTanks t) {
         game = t;
@@ -46,8 +47,7 @@ public class GameScreen extends ScreenAdapter {
         hullSprite = new Sprite(hullImg);
         turretImg = new Texture("data/t34turret.png");
         turretSprite = new Sprite(turretImg);
-        backgroundImg = new Texture("images/sampleback.png");
-        backgroundSprite = new Sprite(backgroundImg);
+        map = new Map(12, 6);
         
         input = new DesktopInput(t);
         Gdx.input.setInputProcessor(input);
@@ -100,49 +100,12 @@ public class GameScreen extends ScreenAdapter {
         hullShape.dispose();
         turretShape.dispose();
         try {
-            Tank tank = new Tank("M4 Sherman");
+            TankReader tank = new TankReader("M4 Sherman");
 //            System.out.println(tank);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-    
-    private boolean sameQuadrant(Body body, Duple dir) {
-        float angle, bodyAngle = (float) Math.toDegrees(body.getAngle());
-        while (bodyAngle < 0) {
-            bodyAngle += 360;
-        }
-        bodyAngle %= 360;
-        body.setTransform(body.getPosition(), (float) Math.toRadians(bodyAngle));
-        if (dir.getX() == 0 && dir.getY() == 0) {
-            return false;
-        } else if (dir.getX() == 0 && dir.getY() == 1) {
-            angle = 90;
-        } else if (dir.getX() == 0 && dir.getY() == -1) {
-            angle = 270;
-        } else if (dir.getX() == 1 && dir.getY() == 0) {
-            angle = 0;
-        } else if (dir.getX() == -1 && dir.getY() == 0) {
-            angle = 180;
-        } else {
-            angle = ((float)Math.toDegrees(Math.atan2(dir.getY(), dir.getX()))
-                    + 360) % 360;
-        }
-        if (bodyAngle >= 0 && bodyAngle <= 90 && 
-                angle >= 0 && angle <= 90) {
-            return true;
-        } else if (bodyAngle >= 90 && bodyAngle <= 180 && 
-                angle >= 90 && angle <= 180) {
-            return true;
-        } else if (bodyAngle >= 180 && bodyAngle <= 270 && 
-                angle >= 180 && angle <= 270) {
-            return true;
-        } else if (bodyAngle >= 270 && bodyAngle <= 360 && 
-                ((angle >= 270 && angle <= 360) || angle == 0)) {
-            return true;
-        }
-        return false;
     }
     
     private int turretRotateDirection(Body body) {
@@ -170,10 +133,14 @@ public class GameScreen extends ScreenAdapter {
     private void updateWorld(float delta) {
         float hullTorque = input.getWasdTorqueDirection((float) 
                 Math.toDegrees(hull.getAngle())) * torqueMultiplier;
-        Duple dir = input.getWasdDirection();
-        if (sameQuadrant(hull, dir)) {
+        if (input.sameQuadrant(hull)) {
             hull.applyForceToCenter((float)(forceMultiplier * 
                     Math.cos(hull.getAngle())), (float)(forceMultiplier * 
+                            Math.sin(hull.getAngle())), true);
+        }
+        if (input.isReversing()) {
+            hull.applyForceToCenter((float)(-forceMultiplier * 1.5f / 2 *
+                    Math.cos(hull.getAngle())), (float)(-forceMultiplier * 1.5f / 2 *
                             Math.sin(hull.getAngle())), true);
         }
         if (hullTorque != 0) {
@@ -196,14 +163,14 @@ public class GameScreen extends ScreenAdapter {
                     - hull.getLinearVelocity().y * hull.getMass() * 
                     9.8f * kFriction, true);
         }
-        float turretTorque = turretRotateDirection(turret) * 1.3f * torqueMultiplier;
+        float turretTorque = turretRotateDirection(turret) * 2f * torqueMultiplier;
         if (turretTorque != 0) {
             if (turret.getAngularVelocity() < 39) {
                 if (!input.closeAngle((float) 
                         Math.toDegrees((turret.getAngle() + 360) % 360), false)) {
                     turret.applyTorque(turretTorque, true);
                 } else {
-                    turret.applyTorque(turretTorque / 2, true);
+                    turret.applyTorque(turretTorque * 3f / 4, true);
                 }
             }
         }
@@ -235,14 +202,12 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 //        camera.translate((hull.getPosition().x - camera.position.x), 
 //                (hull.getPosition().y - camera.position.y));
-        camera.position.x = hullSprite.getX();
-        camera.position.y = hullSprite.getY();
+        camera.position.x = hullSprite.getX() + hullSprite.getWidth() / 2;
+        camera.position.y = hullSprite.getY() + hullSprite.getHeight() / 2;
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        batch.draw(backgroundImg, Gdx.graphics.getWidth() / 2 - 
-                backgroundImg.getWidth() / 2, Gdx.graphics.getHeight() / 2 - 
-                backgroundImg.getHeight() / 2);
+        map.draw(batch, camera);
         batch.draw(hullSprite, hullSprite.getX(), hullSprite.getY(),hullSprite.getOriginX(),
                 hullSprite.getOriginY(),
          hullSprite.getWidth(),hullSprite.getHeight(),hullSprite.getScaleX(),hullSprite.

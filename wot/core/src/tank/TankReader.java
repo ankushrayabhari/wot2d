@@ -11,7 +11,7 @@ import java.util.StringTokenizer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
-public class Tank {
+public class TankReader {
 
     private String[] tankNames = { "M4 Sherman" };
     private FileHandle[] fileNames = { 
@@ -24,7 +24,7 @@ public class Tank {
     private float[] tankFloatValues = new float[3];
     // horsepower per ton, accuracy, aiming time in seconds
 
-    public Tank(String name) throws IOException {
+    public TankReader(String name) throws IOException {
         int fileIndex = 0;
         for (int i = 0; i < tankNames.length; i++) {
             if (tankNames[i] == name) {
