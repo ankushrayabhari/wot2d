@@ -14,7 +14,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.DesktopInput;
 
-import map.Map;
+import map.GameMap;
 
 public class Tank extends WorldObject {
     
@@ -30,10 +30,10 @@ public class Tank extends WorldObject {
     private Body turret;
     private BodyDef bodyDef;
     
-    public Tank(Texture[] textures, World world, 
-            OrthographicCamera camera, Map map, Sprite[] sprites, 
+    public Tank(World world, 
+            OrthographicCamera camera, GameMap map, Sprite[] sprites, 
             DesktopInput input, float pixels_per_meter) {
-        super(textures, world, camera, map, sprites);
+        super(world, camera, map, sprites);
         this.input = input;
         this.pixels_per_meter = pixels_per_meter;
         tankSprite = getSprites();
@@ -74,10 +74,8 @@ public class Tank extends WorldObject {
 
     @Override
     public void updateObject() {
-//        System.out.println((input == null) ? "true" : "false");
-        float hullTorque = input.getWasdTorqueDirection((float) 
-                Math.toDegrees(bodies[0].getAngle())) * torqueMultiplier;
-        if (input.sameQuadrant(bodies[0])) {
+        float hullTorque = input.getWasdTorqueDirection() * torqueMultiplier;
+        if (input.isAccelerating()) {
             bodies[0].applyForceToCenter((float)(forceMultiplier * 
                     Math.cos(bodies[0].getAngle())), (float)(forceMultiplier * 
                             Math.sin(bodies[0].getAngle())), true);
@@ -89,12 +87,7 @@ public class Tank extends WorldObject {
         }
         if (hullTorque != 0) {
             if (bodies[0].getAngularVelocity() < 35) {
-                if (!input.closeAngle((float) 
-                        Math.toDegrees((bodies[0].getAngle() + 360) % 360), true)) {
-                    bodies[0].applyTorque(hullTorque, true);
-                } else {
-                    bodies[0].applyTorque(hullTorque / 2, true);
-                }
+                bodies[0].applyTorque(hullTorque, true);
             }
         }
         if (bodies[0].getAngularVelocity() != 0) {

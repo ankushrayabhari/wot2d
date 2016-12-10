@@ -7,31 +7,31 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
-import map.Map;
+import map.GameMap;
 
 public abstract class WorldObject {
     private Body[] bodies;
-    private Texture[] textures;
     private World world;
     private OrthographicCamera camera;
-    private Map map;
+    private GameMap map;
     private Sprite[] sprites;
     
-    public WorldObject(Texture[] textures, World world, 
-            OrthographicCamera camera, Map map, Sprite[] sprites) {
-        this.textures = textures;
+    public WorldObject(World world, 
+            OrthographicCamera camera, GameMap map, Sprite[] sprites) {
         this.world = world;
         this.camera = camera;
         this.map = map;
         this.sprites = sprites;
     }
     
-    public Body[] getBodies() {
-        return bodies;
+    public WorldObject(World world, 
+            OrthographicCamera camera, Sprite sprite) {
+        this.world = world;
+        this.camera = camera;
     }
     
-    public Texture[] getTextures() {
-        return textures;
+    public Body[] getBodies() {
+        return bodies;
     }
     
     public Sprite[] getSprites() {

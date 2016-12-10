@@ -16,7 +16,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.DesktopInput;
 import com.mygdx.game.WorldOfTanks;
 
-import map.Map;
+import map.GameMap;
 import tank.TankReader;
 import worldobject.Tank;
 import worldobject.WorldObject;
@@ -32,7 +32,7 @@ public class GameScreen extends ScreenAdapter {
     private World world;
     private DesktopInput input;
     private OrthographicCamera camera;
-    private Map map;
+    private GameMap map;
     private Tank tank;
     private ArrayList<WorldObject> worldObjects;
 
@@ -43,18 +43,17 @@ public class GameScreen extends ScreenAdapter {
         hullSprite = new Sprite(hullImg);
         turretImg = new Texture("data/t34turret.png");
         turretSprite = new Sprite(turretImg);
-        map = new Map(12, 6);
         input = new DesktopInput(t);
         Gdx.input.setInputProcessor(input);
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), 
                 Gdx.graphics.getHeight());
         
         worldObjects = new ArrayList<WorldObject>();
-        Texture[] tankTextures = {hullImg, turretImg};
         Sprite[] tankSprites = {hullSprite, turretSprite};
 
         world = new World(new Vector2(0, 0f), true);
-        worldObjects.add(new Tank(tankTextures, world, camera, map, 
+        map = new GameMap(12, 6, world, camera, pixels_per_meter);
+        worldObjects.add(new Tank(world, camera, map, 
                 tankSprites, input, pixels_per_meter));
         Iterator<WorldObject> iterator = worldObjects.iterator();
         while (iterator.hasNext()) {
@@ -79,7 +78,7 @@ public class GameScreen extends ScreenAdapter {
             WorldObject obj = iterator.next();
             obj.updateObject();
         }
-        world.step(delta, 6, 2);
+        world.step(delta, 8, 5);
     }
 
     @Override

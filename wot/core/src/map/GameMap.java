@@ -1,11 +1,18 @@
 package map;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.World;
 
-public class Map {
+import worldobject.Obstacle;
+
+public class GameMap {
     private class MapTile
     {
         private TextureRegion floor;
@@ -36,8 +43,10 @@ public class Map {
             new Texture("data/house_2d.png")};
     private int width, height;
     private Texture ground, factory;
+    private ArrayList<Obstacle> obstacles;
     
-    public Map(int width, int height) {
+    public GameMap(int width, int height, World world, 
+            OrthographicCamera camera, float pixels_per_meter) {
         this.width = width;
         this.height = height;
         map = new MapTile[width][height];
@@ -49,6 +58,25 @@ public class Map {
             }
         }
         mapValues = (new MapReader()).getMapValues();
+        obstacles = new ArrayList<Obstacle>();
+        Sprite[] factorySprite = {new Sprite(factory)};
+        Sprite[] ruinsSprites = new Sprite[ruins.length];
+        for (int i = 0; i < ruins.length; i++) {
+            ruinsSprites[i] = new Sprite(ruins[i]);
+        }
+        for (int i = 0; i < mapValues.length; i++) {
+            for (int j = 0; j < mapValues[i].length; j++) {
+                if (mapValues[i][j] == 2) {
+                    obstacles.add(new Obstacle(world, camera, this, 
+                            factorySprite[0], pixels_per_meter, i * 
+                            ground.getWidth(), j * ground.getHeight()));
+                } else if (mapValues[i][j] == 1) {
+                    obstacles.add(new Obstacle(world, camera, this, 
+                            ruinsSprites[(i + j) % ruinsSprites.length], 
+                            pixels_per_meter, i * ground.getWidth(), j * ground.getHeight()));
+                }
+            }
+        }
     }
     
     public void draw(Batch batch, Camera cam) {
@@ -81,17 +109,15 @@ public class Map {
     }
     
     private void drawObstacles(Batch batch, Camera cam) {
+        int count = 0;
         for (int i = 0; i < mapValues.length; i++) {
             for (int j = 0; j < mapValues[i].length; j++) {
                 if (mapValues[i][j] != 0) {
                     int x = i * ground.getWidth();
                     int y = j * ground.getHeight();
                     if (withinRenderRange(cam, x, y)) {
-                        if (mapValues[i][j] == 1) {
-                            batch.draw(ruins[(i + j) % ruins.length], x, y);
-                        } else {
-                            batch.draw(factory, x, y);
-                        }
+                        obstacles.get(count).drawObject(batch);
+                        count++;
                     }
                 }
             }
