@@ -12,6 +12,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.mygdx.game.DesktopInput;
 
 import map.GameMap;
@@ -28,7 +30,7 @@ public class Tank extends WorldObject {
     private Body[] bodies;
     private Body hull;
     private Body turret;
-    private BodyDef bodyDef;
+    private BodyDef[] bodyDef;
     
     public Tank(World world, 
             OrthographicCamera camera, GameMap map, Sprite[] sprites, 
@@ -37,17 +39,28 @@ public class Tank extends WorldObject {
         this.input = input;
         this.pixels_per_meter = pixels_per_meter;
         tankSprite = getSprites();
-        tankSprite[0] = tankSprite[0];
-        tankSprite[1] = tankSprite[1];
-        bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(tankSprite[0].getX() / pixels_per_meter, 
-                tankSprite[0].getY() / pixels_per_meter);
-        hull = world.createBody(bodyDef);
-        turret = world.createBody(bodyDef);
+        bodyDef = new BodyDef[2];
+        for (int i = 0; i < bodyDef.length; i++) {
+            bodyDef[i] = new BodyDef();
+            bodyDef[i].type = BodyDef.BodyType.DynamicBody;
+            bodyDef[i].position.set(tankSprite[i].getX() / pixels_per_meter, 
+                    tankSprite[i].getY() / pixels_per_meter);
+        }
+        hull = world.createBody(bodyDef[0]);
+        bodyDef[1].position.set(tankSprite[1].getX() / pixels_per_meter * 28f / 59, 
+                tankSprite[1].getY() / pixels_per_meter * 22f / 24);
+        turret = world.createBody(bodyDef[1]);
         bodies = new Body[2];
         bodies[0] = hull;
         bodies[1] = turret;
+        RevoluteJointDef jointDef = new RevoluteJointDef();
+        jointDef.bodyA = bodies[0];
+        jointDef.bodyB = bodies[1];
+        jointDef.localAnchorA.x = tankSprite[0].getWidth() / pixels_per_meter * 4f / 59;
+//        jointDef.localAnchorA.y = 0;
+        jointDef.maxMotorTorque = 5;
+
+        RevoluteJoint joint = (RevoluteJoint) world.createJoint(jointDef);
         bodies[0].setUserData("playerhull");
         bodies[1].setUserData("playerturret");
     }
@@ -102,7 +115,7 @@ public class Tank extends WorldObject {
                     - bodies[0].getLinearVelocity().y * bodies[0].getMass() * 
                     9.8f * kFriction, true);
         }
-        float turretTorque = turretRotateDirection(turret) * 2f * torqueMultiplier;
+        float turretTorque = turretRotateDirection(turret) * torqueMultiplier;
         if (turretTorque != 0) {
             if (bodies[1].getAngularVelocity() < 39) {
                 if (!input.closeAngle((float) 
@@ -118,8 +131,10 @@ public class Tank extends WorldObject {
                     9.8f * torqueFriction, true);
         }
         
-        tankSprite[0].setPosition(bodies[0].getPosition().x * pixels_per_meter, 
-                bodies[0].getPosition().y * pixels_per_meter);
+        tankSprite[0].setPosition(bodies[0].getPosition().x * pixels_per_meter 
+                - tankSprite[0].getWidth() / 2, 
+                bodies[0].getPosition().y * pixels_per_meter -
+                tankSprite[0].getHeight() / 2);
         tankSprite[0].setRotation((float) (Math.toDegrees(bodies[0].getAngle())));
         
         float turretDistance = (float) 
@@ -137,10 +152,6 @@ public class Tank extends WorldObject {
     public void setupObject() {
         tankSprite[0].setPosition(Gdx.graphics.getWidth() / 2 - tankSprite[0].getWidth() / 2,
                 Gdx.graphics.getHeight() / 2);
-
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(tankSprite[0].getX() / pixels_per_meter, 
-                tankSprite[0].getY() / pixels_per_meter);
 
         PolygonShape hullShape = new PolygonShape();
         hullShape.setAsBox(tankSprite[0].getWidth() / 2 / pixels_per_meter, 
@@ -165,7 +176,7 @@ public class Tank extends WorldObject {
         hullFixtureDef.density = 1f;
 
         FixtureDef turretFixtureDef = new FixtureDef();
-        turretFixtureDef.shape = hullShape;
+        turretFixtureDef.shape = turretShape;
         turretFixtureDef.density = 1f;
 
         Fixture turretFixture = bodies[1].createFixture(turretFixtureDef);

@@ -11,7 +11,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.CollisionListener;
 import com.mygdx.game.DesktopInput;
@@ -36,6 +38,8 @@ public class GameScreen extends ScreenAdapter {
     private GameMap map;
     private Tank tank;
     private ArrayList<WorldObject> worldObjects;
+    Matrix4 debugMatrix;
+    Box2DDebugRenderer debugRenderer;
 
     public GameScreen(WorldOfTanks t) {
         game = t;
@@ -65,6 +69,7 @@ public class GameScreen extends ScreenAdapter {
                 tank = (Tank) wobj;
             }
         }
+        debugRenderer = new Box2DDebugRenderer();
         try {
             TankReader tank = new TankReader("M4 Sherman");
 //            System.out.println(tank);
@@ -93,6 +98,8 @@ public class GameScreen extends ScreenAdapter {
         camera.position.y = tank.getY() + tank.getHeight() / 2;
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+        debugMatrix = batch.getProjectionMatrix().cpy().scale(pixels_per_meter,
+                pixels_per_meter, 0);
         batch.begin();
         map.draw(batch, camera);
         Iterator<WorldObject> iterator = worldObjects.iterator();
@@ -101,6 +108,7 @@ public class GameScreen extends ScreenAdapter {
             obj.drawObject(batch);
         }
         batch.end();
+        debugRenderer.render(world, debugMatrix);
     }
 
     @Override
