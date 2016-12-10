@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.game.CollisionListener;
 import com.mygdx.game.DesktopInput;
 import com.mygdx.game.WorldOfTanks;
 
@@ -52,6 +53,7 @@ public class GameScreen extends ScreenAdapter {
         Sprite[] tankSprites = {hullSprite, turretSprite};
 
         world = new World(new Vector2(0, 0f), true);
+        world.setContactListener(new CollisionListener());
         map = new GameMap(12, 6, world, camera, pixels_per_meter);
         worldObjects.add(new Tank(world, camera, map, 
                 tankSprites, input, pixels_per_meter));
@@ -78,7 +80,7 @@ public class GameScreen extends ScreenAdapter {
             WorldObject obj = iterator.next();
             obj.updateObject();
         }
-        world.step(delta, 8, 5);
+        world.step(1/60f, 8, 5);
     }
 
     @Override

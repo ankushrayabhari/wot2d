@@ -48,6 +48,8 @@ public class Tank extends WorldObject {
         bodies = new Body[2];
         bodies[0] = hull;
         bodies[1] = turret;
+        bodies[0].setUserData("playerhull");
+        bodies[1].setUserData("playerturret");
     }
     
     private int turretRotateDirection(Body body) {

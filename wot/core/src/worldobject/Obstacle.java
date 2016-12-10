@@ -32,6 +32,7 @@ public class Obstacle extends WorldObject {
         bodyDef.position.set(sprite.getX() / pixels_per_meter, 
                 sprite.getY() / pixels_per_meter);
         obstacle = world.createBody(bodyDef);
+        obstacle.setUserData("obstacle");
         this.x = x;
         this.y = y;
     }
