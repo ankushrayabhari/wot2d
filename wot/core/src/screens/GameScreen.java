@@ -58,9 +58,9 @@ public class GameScreen extends ScreenAdapter {
 
         world = new World(new Vector2(0, 0f), true);
         world.setContactListener(new CollisionListener());
-        map = new GameMap(this, 12, 6, world, camera, pixels_per_meter);
         worldObjects.add(new Tank(world, camera, map, 
-                tankSprites, input, pixels_per_meter));
+                tankSprites, input, pixels_per_meter, this));
+        map = new GameMap(this, 12, 6, world, camera, pixels_per_meter);
         Iterator<WorldObject> iterator = worldObjects.iterator();
         while (iterator.hasNext()) {
             WorldObject wobj = iterator.next();
@@ -84,6 +84,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void updateWorld(float delta) {
+        Tank player = (Tank) worldObjects.get(0);
+        player.shoot();
         Iterator<WorldObject> iterator = worldObjects.iterator();
         while (iterator.hasNext()) {
             WorldObject obj = iterator.next();

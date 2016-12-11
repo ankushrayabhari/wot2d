@@ -22,6 +22,10 @@ public class DesktopInput extends InputAdapter {
         return isKeyPressed[0];
     }
     
+    public boolean isShooting() {
+        return isKeyPressed[4];
+    }
+    
     public float getMouseAngleInRad() {
         float dX = Gdx.input.getX() - Gdx.graphics.getWidth() / 2;
         float dY = Gdx.graphics.getHeight() / 2 - Gdx.input.getY();
@@ -81,6 +85,18 @@ public class DesktopInput extends InputAdapter {
                 return false;
             }
         }
+        return true;
+    }
+    
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        isKeyPressed[4] = true;
+        return true;
+    }
+    
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        isKeyPressed[4] = false;
         return true;
     }
 }

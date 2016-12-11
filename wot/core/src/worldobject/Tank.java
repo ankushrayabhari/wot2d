@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.mygdx.game.DesktopInput;
 
 import map.GameMap;
+import screens.GameScreen;
 
 public class Tank extends WorldObject {
     
@@ -31,14 +32,26 @@ public class Tank extends WorldObject {
     private Body hull;
     private Body turret;
     private BodyDef[] bodyDef;
+    private float timeElapsed = 0;
+    private GameScreen screen;
+    private OrthographicCamera camera;
+    private World world;
+    private GameMap map;
+    private Sprite shellSprite;
     
     public Tank(World world, 
             OrthographicCamera camera, GameMap map, Sprite[] sprites, 
-            DesktopInput input, float pixels_per_meter) {
+            DesktopInput input, float pixels_per_meter, GameScreen screen) {
         super(world, camera, map, pixels_per_meter);
         this.input = input;
+        this.world = world;
+        this.camera = camera;
+        this.map = map;
         this.pixels_per_meter = pixels_per_meter;
+        this.screen = screen;
         tankSprite = sprites;
+        Texture shellTexture = new Texture("data/shell.png");
+        shellSprite = new Sprite(shellTexture);
         bodyDef = new BodyDef[2];
         for (int i = 0; i < bodyDef.length; i++) {
             bodyDef[i] = new BodyDef();
@@ -85,9 +98,32 @@ public class Tank extends WorldObject {
         }
         return -1;
     }
+    
+    public void shoot() {
+        if (input.isShooting() && timeElapsed > 0.1f) {
+            timeElapsed = 0;
+            float turretDistance = (float) 
+                    Math.sqrt(Math.pow(tankSprite[0].getHeight() * (0.5 - 16f / 31), 2) + 
+                    Math.pow(tankSprite[0].getWidth() * (0.5 - 36f / 61), 2));
+            float x = tankSprite[0].getX() + tankSprite[0].getWidth() / 2 
+                    + (float) (turretDistance * Math.cos(bodies[0].getAngle())) 
+                    - tankSprite[1].getWidth() * 16f / 59 + tankSprite[1].getWidth() * 51f / 59 * 
+                    (float) (Math.cos(bodies[1].getAngle()));
+            float y = tankSprite[0].getY() + tankSprite[0].getHeight() / 2 + (float) 
+                    (turretDistance * Math.sin(bodies[0].getAngle())) - 
+                    tankSprite[1].getHeight() / 2 + tankSprite[1].getWidth() * 51f / 59 * 
+                    (float) (Math.sin(bodies[1].getAngle()));
+            Shell shell = new Shell(world, camera, map, shellSprite, 
+                    pixels_per_meter, x, y, bodies[1].getAngle());
+            shell.setupObject();
+            screen.addWorldObject(shell);
+        }
+    }
 
     @Override
     public void updateObject() {
+        timeElapsed += 1/60f;
+//        System.out.println(timeElapsed);
         float hullTorque = input.getWasdTorqueDirection() * torqueMultiplier;
         if (input.isAccelerating()) {
             bodies[0].applyForceToCenter((float)(forceMultiplier * 
