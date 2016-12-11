@@ -15,7 +15,7 @@ import screens.GameScreen;
 import screens.SplashScreen;
 
 public class WorldOfTanks extends Game {
-    public static final String TITLE = "World of Tanks 2D", VERSION = "0.3";
+    public static final String TITLE = "World of Tanks 2D", VERSION = "0.5";
     public static final int GAME_WIDTH = 1600;
     public static final int GAME_HEIGHT = 900;
     private ScreenAdapter splashScreen, gameScreen;

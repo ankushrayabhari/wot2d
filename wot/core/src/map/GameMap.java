@@ -91,11 +91,11 @@ public class GameMap {
         drawBoundaries(batch, cam);
     }
     
-    public static boolean withinRenderRange(Camera cam, float x, float y) {
-        if (x >= cam.position.x - cam.viewportWidth && x <= 
+    public static boolean withinRenderRange(Camera cam, float xPixels, float yPixels) {
+        if (xPixels >= cam.position.x - cam.viewportWidth && xPixels <= 
                         cam.position.x + cam.viewportWidth / 2
-                        && y >= cam.position.y - cam.viewportHeight && 
-                        y <= cam.position.y + cam.viewportHeight / 2) {
+                        && yPixels >= cam.position.y - cam.viewportHeight && 
+                        yPixels <= cam.position.y + cam.viewportHeight / 2) {
             return true;
         }
         return false;

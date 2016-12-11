@@ -19,17 +19,7 @@ public class PlayerTank extends TankObject {
             DesktopInput input, float pixels_per_meter, GameScreen screen) {
         super(world, camera, map, sprites, pixels_per_meter, screen, 1500, 1500);
         this.input = input;
-        setUserData("playerhull", "playerturret");
-    }
-
-    @Override
-    public String getUserData() {
-        return getHull().getUserData().toString() + " " + getTurret().getUserData().toString();
-    }
-
-    @Override
-    public float getTurretAngleInRad() {
-        return input.getMouseAngleInRad();
+        setUserData(getHull(), getTurret());
     }
 
     @Override

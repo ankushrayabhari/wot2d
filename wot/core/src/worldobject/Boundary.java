@@ -64,8 +64,8 @@ public class Boundary extends WorldObject {
     }
 
     @Override
-    public String getUserData() {
-        return "boundary";
+    public Body getUserData() {
+        return boundary;
     }
 
     @Override

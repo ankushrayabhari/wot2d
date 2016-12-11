@@ -85,8 +85,8 @@ public class Obstacle extends WorldObject {
     }
 
     @Override
-    public String getUserData() {
-        return (String) obstacle.getUserData();
+    public Body getUserData() {
+        return obstacle;
     }
 
     @Override

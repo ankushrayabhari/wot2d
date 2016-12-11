@@ -53,8 +53,6 @@ public abstract class TankObject extends WorldObject {
                     (tankSprite[i].getY() + y) / pixels_per_meter);
         }
         hull = world.createBody(bodyDef[0]);
-        bodyDef[1].position.set((tankSprite[1].getX() + 1500) / pixels_per_meter, 
-                (tankSprite[1].getY() + 1500) / pixels_per_meter);
         turret = world.createBody(bodyDef[1]);
         bodies = new Body[2];
         bodies[0] = hull;
@@ -69,7 +67,7 @@ public abstract class TankObject extends WorldObject {
     }
     
     
-    public void setUserData(String hullUserData, String turretUserData) {
+    public void setUserData(Body hullUserData, Body turretUserData) {
         bodies[0].setUserData(hullUserData);
         bodies[1].setUserData(turretUserData);
     }
@@ -110,8 +108,6 @@ public abstract class TankObject extends WorldObject {
         return false;
     }
     
-    public abstract float getTurretAngleInRad();
-    
     public abstract float getHullTorque();
     
     public abstract float getTurretTorque();
@@ -125,8 +121,8 @@ public abstract class TankObject extends WorldObject {
     public abstract float getAimingAngleInRad();
 
     @Override
-    public String getUserData() {
-        return bodies[0].getUserData().toString() + " " + bodies[1].getUserData().toString();
+    public Body getUserData() {
+        return bodies[0];
     }
 
     @Override
@@ -150,7 +146,7 @@ public abstract class TankObject extends WorldObject {
     }
     
     public int turretRotateDirection(Body body) {
-        float aimingAngle = getTurretAngleInRad();
+        float aimingAngle = getAimingAngleInRad();
         if (aimingAngle < 0) {
             return 0;
         }
@@ -266,14 +262,16 @@ public abstract class TankObject extends WorldObject {
 
     @Override
     public void drawObject(Batch batch) {
-        batch.draw(tankSprite[0], tankSprite[0].getX(), tankSprite[0].getY(),tankSprite[0].getOriginX(),
-                tankSprite[0].getOriginY(),
-         tankSprite[0].getWidth(),tankSprite[0].getHeight(),tankSprite[0].getScaleX(),tankSprite[0].
-                         getScaleY(),tankSprite[0].getRotation());
-        batch.draw(tankSprite[1], tankSprite[1].getX(), tankSprite[1].getY(), 
-                tankSprite[1].getOriginX(), tankSprite[1].getOriginY(),
-         tankSprite[1].getWidth(),tankSprite[1].getHeight(),tankSprite[1].getScaleX(),tankSprite[1].
-                         getScaleY(),tankSprite[1].getRotation());
+        if (GameMap.withinRenderRange(camera, getX(), getY())) {
+            batch.draw(tankSprite[0], tankSprite[0].getX(), tankSprite[0].getY(),tankSprite[0].getOriginX(),
+                    tankSprite[0].getOriginY(),
+             tankSprite[0].getWidth(),tankSprite[0].getHeight(),tankSprite[0].getScaleX(),tankSprite[0].
+                             getScaleY(),tankSprite[0].getRotation());
+            batch.draw(tankSprite[1], tankSprite[1].getX(), tankSprite[1].getY(), 
+                    tankSprite[1].getOriginX(), tankSprite[1].getOriginY(),
+             tankSprite[1].getWidth(),tankSprite[1].getHeight(),tankSprite[1].getScaleX(),tankSprite[1].
+                             getScaleY(),tankSprite[1].getRotation());
+        }
     }
 
 }

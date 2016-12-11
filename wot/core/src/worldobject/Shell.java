@@ -103,8 +103,8 @@ public class Shell extends WorldObject {
     }
 
     @Override
-    public String getUserData() {
-        return "shell";
+    public Body getUserData() {
+        return shell;
     }
 
 }
