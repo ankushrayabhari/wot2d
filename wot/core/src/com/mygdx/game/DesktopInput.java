@@ -44,14 +44,6 @@ public class DesktopInput extends InputAdapter {
         }
         return angle %= (float) (Math.PI * 2);
     }
-    
-    public boolean closeAngle(float angleInDegrees, boolean isWasd) {
-        float angle = getMouseAngleInRad();
-        if (Math.abs(Math.toRadians(angle - angleInDegrees)) < 35) {
-            return true;
-        }
-        return false;
-    }
 
     public float getWasdTorqueDirection() {
         if ((isKeyPressed[1] && !isKeyPressed[2]) || (isKeyPressed[3] && 

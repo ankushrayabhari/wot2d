@@ -21,7 +21,7 @@ import com.mygdx.game.WorldOfTanks;
 
 import map.GameMap;
 import tank.TankReader;
-import worldobject.Tank;
+import worldobject.PlayerTank;
 import worldobject.WorldObject;
 
 public class GameScreen extends ScreenAdapter {
@@ -36,7 +36,7 @@ public class GameScreen extends ScreenAdapter {
     private DesktopInput input;
     private OrthographicCamera camera;
     private GameMap map;
-    private Tank tank;
+    private PlayerTank tank;
     private ArrayList<WorldObject> worldObjects;
     Matrix4 debugMatrix;
     Box2DDebugRenderer debugRenderer;
@@ -58,15 +58,15 @@ public class GameScreen extends ScreenAdapter {
 
         world = new World(new Vector2(0, 0f), true);
         world.setContactListener(new CollisionListener());
-        worldObjects.add(new Tank(world, camera, map, 
+        worldObjects.add(new PlayerTank(world, camera, map, 
                 tankSprites, input, pixels_per_meter, this));
         map = new GameMap(this, 12, 6, world, camera, pixels_per_meter);
         Iterator<WorldObject> iterator = worldObjects.iterator();
         while (iterator.hasNext()) {
             WorldObject wobj = iterator.next();
             wobj.setupObject();
-            if (wobj instanceof Tank) {
-                tank = (Tank) wobj;
+            if (wobj instanceof PlayerTank) {
+                tank = (PlayerTank) wobj;
             }
         }
         debugRenderer = new Box2DDebugRenderer();
@@ -84,7 +84,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void updateWorld(float delta) {
-        Tank player = (Tank) worldObjects.get(0);
+        PlayerTank player = (PlayerTank) worldObjects.get(0);
         player.shoot();
         Iterator<WorldObject> iterator = worldObjects.iterator();
         while (iterator.hasNext()) {
