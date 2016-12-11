@@ -10,53 +10,31 @@ import com.badlogic.gdx.physics.box2d.World;
 import map.GameMap;
 
 public abstract class WorldObject {
-    private Body[] bodies;
-    private World world;
-    private OrthographicCamera camera;
-    private GameMap map;
-    private Sprite[] sprites;
     
     public WorldObject(World world, 
-            OrthographicCamera camera, GameMap map, Sprite[] sprites) {
-        this.world = world;
-        this.camera = camera;
-        this.map = map;
-        this.sprites = sprites;
+            OrthographicCamera camera, GameMap map, float pixels_per_meter) {
     }
     
     public WorldObject(World world, 
             OrthographicCamera camera, Sprite sprite) {
-        this.world = world;
-        this.camera = camera;
     }
     
-    public Body[] getBodies() {
-        return bodies;
+    public WorldObject(World world, float pixels_per_meter) {
     }
     
-    public Sprite[] getSprites() {
-        return sprites;
-    }
+    public abstract float getX();
     
-    public float getX() {
-        return sprites[0].getX();
-    }
+    public abstract float getY();
     
-    public float getY() {
-        return sprites[0].getY();
-    }
+    public abstract float getHeight();
     
-    public float getHeight() {
-        return sprites[0].getHeight();
-    }
-    
-    public float getWidth() {
-        return sprites[0].getWidth();
-    }
+    public abstract float getWidth();
     
     public abstract void updateObject();
     
     public abstract void setupObject();
     
     public abstract void drawObject(Batch batch);
+    
+    public abstract String getUserData();
 }

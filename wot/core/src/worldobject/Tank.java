@@ -22,8 +22,8 @@ public class Tank extends WorldObject {
     
     private DesktopInput input;
     private float pixels_per_meter;
-    private final float forceMultiplier = 12; // actual gameplay value = 6
-    private final float torqueMultiplier = 0.3f;
+    private final float forceMultiplier = 18; // actual gameplay value = 6
+    private final float torqueMultiplier = 0.5f; // old value = 0.3f
     private final float kFriction = 0.45f;
     private final float torqueFriction = 0.15f;
     private Sprite[] tankSprite;
@@ -35,20 +35,20 @@ public class Tank extends WorldObject {
     public Tank(World world, 
             OrthographicCamera camera, GameMap map, Sprite[] sprites, 
             DesktopInput input, float pixels_per_meter) {
-        super(world, camera, map, sprites);
+        super(world, camera, map, pixels_per_meter);
         this.input = input;
         this.pixels_per_meter = pixels_per_meter;
-        tankSprite = getSprites();
+        tankSprite = sprites;
         bodyDef = new BodyDef[2];
         for (int i = 0; i < bodyDef.length; i++) {
             bodyDef[i] = new BodyDef();
             bodyDef[i].type = BodyDef.BodyType.DynamicBody;
-            bodyDef[i].position.set(tankSprite[i].getX() / pixels_per_meter, 
-                    tankSprite[i].getY() / pixels_per_meter);
+            bodyDef[i].position.set((tankSprite[i].getX() + 1500) / pixels_per_meter, 
+                    (tankSprite[i].getY() + 1500) / pixels_per_meter);
         }
         hull = world.createBody(bodyDef[0]);
-        bodyDef[1].position.set(tankSprite[1].getX() / pixels_per_meter * 28f / 59, 
-                tankSprite[1].getY() / pixels_per_meter * 22f / 24);
+        bodyDef[1].position.set((tankSprite[1].getX() + 1500) / pixels_per_meter, 
+                (tankSprite[1].getY() + 1500) / pixels_per_meter);
         turret = world.createBody(bodyDef[1]);
         bodies = new Body[2];
         bodies[0] = hull;
@@ -57,7 +57,6 @@ public class Tank extends WorldObject {
         jointDef.bodyA = bodies[0];
         jointDef.bodyB = bodies[1];
         jointDef.localAnchorA.x = tankSprite[0].getWidth() / pixels_per_meter * 4f / 59;
-//        jointDef.localAnchorA.y = 0;
         jointDef.maxMotorTorque = 5;
 
         RevoluteJoint joint = (RevoluteJoint) world.createJoint(jointDef);
@@ -197,6 +196,31 @@ public class Tank extends WorldObject {
                 tankSprite[1].getOriginX(), tankSprite[1].getOriginY(),
          tankSprite[1].getWidth(),tankSprite[1].getHeight(),tankSprite[1].getScaleX(),tankSprite[1].
                          getScaleY(),tankSprite[1].getRotation());
+    }
+
+    @Override
+    public String getUserData() {
+        return bodies[0].getUserData().toString() + " " + bodies[1].getUserData().toString();
+    }
+
+    @Override
+    public float getX() {
+        return tankSprite[0].getX();
+    }
+
+    @Override
+    public float getY() {
+        return tankSprite[0].getY();
+    }
+
+    @Override
+    public float getHeight() {
+        return tankSprite[0].getHeight();
+    }
+
+    @Override
+    public float getWidth() {
+        return tankSprite[0].getWidth();
     }
 
 }

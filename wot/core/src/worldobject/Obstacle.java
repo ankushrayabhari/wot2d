@@ -16,23 +16,23 @@ import map.GameMap;
 
 public class Obstacle extends WorldObject {
 
-    private float pixels_per_meter;
+    private float pixels_per_meter, xCrop, yCrop;
     private Sprite sprite;
     private Body obstacle;
     private BodyDef bodyDef;
-    private int x, y;
+    private float x, y;
+    private OrthographicCamera camera;
+    private World world;
+    private String obstacleType;
     
-    public Obstacle(World world, OrthographicCamera camera, 
-            GameMap map, Sprite sprite, float pixels_per_meter, int x, int y) {
+    public Obstacle(String obstacleType, World world, OrthographicCamera camera, 
+            GameMap map, Sprite sprite, float pixels_per_meter, float x, float y) {
         super(world, camera, sprite);
         this.sprite = sprite;
+        this.world = world;
         this.pixels_per_meter = pixels_per_meter;
-        bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(sprite.getX() / pixels_per_meter, 
-                sprite.getY() / pixels_per_meter);
-        obstacle = world.createBody(bodyDef);
-        obstacle.setUserData("obstacle");
+        this.camera = camera;
+        this.obstacleType = obstacleType;
         this.x = x;
         this.y = y;
     }
@@ -43,16 +43,25 @@ public class Obstacle extends WorldObject {
 
     @Override
     public void setupObject() {
-        sprite.setPosition(Gdx.graphics.getWidth() / 2 - sprite.getWidth() / 2,
-                Gdx.graphics.getHeight() / 2);
-
+        this.sprite.setPosition(x, y);
+        bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(sprite.getX() / pixels_per_meter, 
-                sprite.getY() / pixels_per_meter);
-
+        if (obstacleType.equals("factory")) {
+            bodyDef.position.set((sprite.getX() + sprite.getWidth() * 0.51f) / pixels_per_meter, 
+                    (sprite.getY() + sprite.getHeight() * 0.67f) / pixels_per_meter);
+            xCrop = 0.95f;
+            yCrop = 0.65f;
+        } else {
+            bodyDef.position.set((sprite.getX() + sprite.getWidth() / 2) / pixels_per_meter, 
+                    (sprite.getY() + sprite.getHeight() * 0.45f) / pixels_per_meter);
+            xCrop = 0.7f;
+            yCrop = 0.65f;
+        }
+        obstacle = world.createBody(bodyDef);
+        obstacle.setUserData("obstacle");
         PolygonShape obstacleShape = new PolygonShape();
-        obstacleShape.setAsBox(sprite.getWidth() / 2 / pixels_per_meter, 
-                sprite.getHeight() / 2 / pixels_per_meter);
+        obstacleShape.setAsBox(sprite.getWidth() / 2 / pixels_per_meter * xCrop, 
+                sprite.getHeight() / 2 / pixels_per_meter * yCrop);
         
         FixtureDef obstacleFixtureDef = new FixtureDef();
         obstacleFixtureDef.shape = obstacleShape;
@@ -65,12 +74,39 @@ public class Obstacle extends WorldObject {
 
     @Override
     public void drawObject(Batch batch) {
-        batch.draw(sprite, x, 
-                y,sprite.getOriginX(),
-                sprite.getOriginY(),
-         sprite.getWidth(),sprite.getHeight(),
-         sprite.getScaleX(),sprite.
-                         getScaleY(),sprite.getRotation());
+        if (GameMap.withinRenderRange(camera, x, y)) {
+            batch.draw(sprite, x, 
+                    y,sprite.getOriginX(),
+                    sprite.getOriginY(),
+             sprite.getWidth(),sprite.getHeight(),
+             sprite.getScaleX(),sprite.
+                             getScaleY(),sprite.getRotation());
+        }
+    }
+
+    @Override
+    public String getUserData() {
+        return (String) obstacle.getUserData();
+    }
+
+    @Override
+    public float getX() {
+        return sprite.getX();
+    }
+
+    @Override
+    public float getY() {
+        return sprite.getY();
+    }
+
+    @Override
+    public float getHeight() {
+        return sprite.getHeight();
+    }
+
+    @Override
+    public float getWidth() {
+        return sprite.getWidth();
     }
 
 }

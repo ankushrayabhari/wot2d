@@ -29,7 +29,7 @@ public class CollisionListener implements ContactListener {
     public void postSolve(Contact contact, ContactImpulse impulse) {
         if ((contact.getFixtureA().getBody().getUserData().equals("playerhull")) 
                 || (contact.getFixtureB().getBody().getUserData().equals("playerhull"))) {
-            System.out.println(contact.getFixtureA().getBody().getUserData() + " " + contact.getFixtureB().getBody().getUserData());
+//            System.out.println(contact.getFixtureA().getBody().getUserData() + " " + contact.getFixtureB().getBody().getUserData());
         }
     }
 

@@ -58,7 +58,7 @@ public class GameScreen extends ScreenAdapter {
 
         world = new World(new Vector2(0, 0f), true);
         world.setContactListener(new CollisionListener());
-        map = new GameMap(12, 6, world, camera, pixels_per_meter);
+        map = new GameMap(this, 12, 6, world, camera, pixels_per_meter);
         worldObjects.add(new Tank(world, camera, map, 
                 tankSprites, input, pixels_per_meter));
         Iterator<WorldObject> iterator = worldObjects.iterator();
@@ -78,12 +78,17 @@ public class GameScreen extends ScreenAdapter {
             e.printStackTrace();
         }
     }
+    
+    public void addWorldObject(WorldObject wobj) {
+        worldObjects.add(wobj);
+    }
 
     private void updateWorld(float delta) {
         Iterator<WorldObject> iterator = worldObjects.iterator();
         while (iterator.hasNext()) {
             WorldObject obj = iterator.next();
             obj.updateObject();
+//            System.out.println(obj.getUserData());
         }
         world.step(1/60f, 8, 5);
     }
