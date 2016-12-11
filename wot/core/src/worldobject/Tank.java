@@ -107,11 +107,11 @@ public class Tank extends WorldObject {
                     Math.pow(tankSprite[0].getWidth() * (0.5 - 36f / 61), 2));
             float x = tankSprite[0].getX() + tankSprite[0].getWidth() / 2 
                     + (float) (turretDistance * Math.cos(bodies[0].getAngle())) 
-                    - tankSprite[1].getWidth() * 16f / 59 + tankSprite[1].getWidth() * 51f / 59 * 
+                    + tankSprite[1].getWidth() * 47f / 59 * 
                     (float) (Math.cos(bodies[1].getAngle()));
             float y = tankSprite[0].getY() + tankSprite[0].getHeight() / 2 + (float) 
-                    (turretDistance * Math.sin(bodies[0].getAngle())) - 
-                    tankSprite[1].getHeight() / 2 + tankSprite[1].getWidth() * 51f / 59 * 
+                    (turretDistance * Math.sin(bodies[0].getAngle()))
+                    + tankSprite[1].getWidth() * 47f / 59 * 
                     (float) (Math.sin(bodies[1].getAngle()));
             Shell shell = new Shell(world, camera, map, shellSprite, 
                     pixels_per_meter, x, y, bodies[1].getAngle());

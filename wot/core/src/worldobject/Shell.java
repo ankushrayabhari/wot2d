@@ -68,9 +68,11 @@ public class Shell extends WorldObject {
         this.sprite.setPosition(x, y);
         bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set((sprite.getX() + sprite.getWidth() / 2) / pixels_per_meter, 
-                (sprite.getY() + sprite.getHeight() / 2) / pixels_per_meter);
+//        bodyDef.position.setAngleRad(angle + (float) (Math.PI / 2));
+        bodyDef.position.set((sprite.getX() - sprite.getWidth() / 2) / pixels_per_meter, 
+                (sprite.getY()) / pixels_per_meter);
         shell = world.createBody(bodyDef);
+        shell.setTransform(shell.getPosition(), angle - (float) (Math.PI / 2));
         shell.setUserData("shell");
         shell.setLinearVelocity((float) (Math.cos(angle) * velocity), (float) 
                 (Math.sin(angle) * velocity));
@@ -89,11 +91,15 @@ public class Shell extends WorldObject {
 
     @Override
     public void drawObject(Batch batch) {
-        sprite.setPosition(shell.getPosition().x, shell.getPosition().y);
+        float x = shell.getPosition().x * pixels_per_meter - sprite.getWidth() / 2;
+        float y = shell.getPosition().y * pixels_per_meter - sprite.getHeight() / 2;
+        sprite.setPosition(x, y);
         sprite.setRotation((float) (Math.toDegrees(shell.getAngle())));
-        batch.draw(sprite, pixels_per_meter, velocity, sprite.getOriginX(), 
-                sprite.getOriginY(), sprite.getWidth() / 2, 
-                sprite.getHeight() / 2, sprite.getScaleX(), sprite.getScaleY(), sprite.getRotation());
+        if (GameMap.withinRenderRange(camera, x, y)) {
+            batch.draw(sprite, x, y, sprite.getOriginX(), 
+                    sprite.getOriginY(), sprite.getWidth(), 
+                    sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), sprite.getRotation());
+        }
     }
 
     @Override
