@@ -129,69 +129,71 @@ public class EnemyTank extends TankObject {
 
     @Override
     public float getHullForceX() {
-        float forceX = 0;
-        float finalAngle = (float) ((Math.atan2(player.getY() - getY(), player.getX() - 
-                getX()) + 2 * Math.PI) % (2 * Math.PI));
-        float angle = getHull().getAngle();
-        while (angle < 0) {
-            angle += Math.PI * 2;
-        }
-        if (angle >= Math.PI * 2) {
-            angle %= Math.PI * 2;
-        }
-        while (finalAngle < 0) {
-            finalAngle += Math.PI * 2;
-        }
-        if (finalAngle >= Math.PI * 2) {
-            finalAngle %= Math.PI * 2;
-        }
-        if (chase == true) {
-            if (Math.abs(finalAngle - angle) >= Math.PI / 2 || getDistance() < 20) {
-                forceX = (float)(-forceMultiplier * 1.5f / 2 *
-                        Math.cos(getHull().getAngle()));
-            } else if (getDistance() > 40) {
-                forceX = (float)(forceMultiplier * 
-                        Math.cos(getHull().getAngle()));
-            }
-        }
-        return forceX;
+        return 0;
+//        float forceX = 0;
+//        float finalAngle = (float) ((Math.atan2(player.getY() - getY(), player.getX() - 
+//                getX()) + 2 * Math.PI) % (2 * Math.PI));
+//        float angle = getHull().getAngle();
+//        while (angle < 0) {
+//            angle += Math.PI * 2;
+//        }
+//        if (angle >= Math.PI * 2) {
+//            angle %= Math.PI * 2;
+//        }
+//        while (finalAngle < 0) {
+//            finalAngle += Math.PI * 2;
+//        }
+//        if (finalAngle >= Math.PI * 2) {
+//            finalAngle %= Math.PI * 2;
+//        }
+//        if (chase == true) {
+//            if (Math.abs(finalAngle - angle) >= Math.PI / 2 || getDistance() < 20) {
+//                forceX = (float)(-forceMultiplier * 1.5f / 2 *
+//                        Math.cos(getHull().getAngle()));
+//            } else if (getDistance() > 40) {
+//                forceX = (float)(forceMultiplier * 
+//                        Math.cos(getHull().getAngle()));
+//            }
+//        }
+//        return forceX;
     }
 
     @Override
     public float getHullForceY() {
-        float forceY = 0;
-        float finalAngle = (float) ((Math.atan2(player.getY() - getY(), player.getX() - 
-                getX()) + 2 * Math.PI) % (2 * Math.PI));
-        float angle = getHull().getAngle();
-        while (angle < 0) {
-            angle += Math.PI * 2;
-        }
-        if (angle >= Math.PI * 2) {
-            angle %= Math.PI * 2;
-        }
-        while (finalAngle < 0) {
-            finalAngle += Math.PI * 2;
-        }
-        if (finalAngle >= Math.PI * 2) {
-            finalAngle %= Math.PI * 2;
-        }
-        if (chase == true) {
-            if (Math.abs(finalAngle - angle) >= Math.PI / 2 || getDistance() < 20) {
-                forceY = (float)(-forceMultiplier * 1.5f / 2 *
-                        Math.sin(getHull().getAngle()));
-            } else if (getDistance() > 40) {
-                forceY = (float)(forceMultiplier * 
-                        Math.sin(getHull().getAngle()));
-            }
-        }
-        return forceY;
+        return 0;
+//        float forceY = 0;
+//        float finalAngle = (float) ((Math.atan2(player.getY() - getY(), player.getX() - 
+//                getX()) + 2 * Math.PI) % (2 * Math.PI));
+//        float angle = getHull().getAngle();
+//        while (angle < 0) {
+//            angle += Math.PI * 2;
+//        }
+//        if (angle >= Math.PI * 2) {
+//            angle %= Math.PI * 2;
+//        }
+//        while (finalAngle < 0) {
+//            finalAngle += Math.PI * 2;
+//        }
+//        if (finalAngle >= Math.PI * 2) {
+//            finalAngle %= Math.PI * 2;
+//        }
+//        if (chase == true) {
+//            if (Math.abs(finalAngle - angle) >= Math.PI / 2 || getDistance() < 20) {
+//                forceY = (float)(-forceMultiplier * 1.5f / 2 *
+//                        Math.sin(getHull().getAngle()));
+//            } else if (getDistance() > 40) {
+//                forceY = (float)(forceMultiplier * 
+//                        Math.sin(getHull().getAngle()));
+//            }
+//        }
+//        return forceY;
     }
 
     @Override
     public boolean isShooting() {
-        return (GameMap.withinRenderRange(camera, getX(), getY()) && 
-                clearPath());
-//        return false;
+//        return (GameMap.withinRenderRange(camera, getX(), getY()) && 
+//                clearPath());
+        return false;
     }
 
     @Override

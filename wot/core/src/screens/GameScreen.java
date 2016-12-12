@@ -75,7 +75,9 @@ public class GameScreen extends ScreenAdapter {
         tankObjects.add(playerTank);
         for (int i = 0; i < enemySprites.length; i++) {
             EnemyTank enemy = new EnemyTank(world, camera, map, 
-                    enemySprites[i], pixels_per_meter, this, 3000, 1000 + 500 * i);
+                    enemySprites[i], pixels_per_meter, this, 2000 + (int) 
+                    (Math.random() * 2000), 1000 + (500 + (int) (Math.random() 
+                            * 100)) * i);
             worldObjects.add(enemy);
             tankObjects.add(enemy);
         }
@@ -104,6 +106,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void updateWorld(float delta) {
+        world.step(1/60f, 8, 5);
         Iterator<TankObject> tankIter = tankObjects.iterator();
         while (tankIter.hasNext()) {
             TankObject obj = tankIter.next();
@@ -120,7 +123,6 @@ public class GameScreen extends ScreenAdapter {
                 objectIter.remove();
             }
         }
-        world.step(1/60f, 8, 5);
     }
 
     @Override

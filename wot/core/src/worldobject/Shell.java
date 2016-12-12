@@ -88,6 +88,7 @@ public class Shell extends WorldObject {
         shell = world.createBody(bodyDef);
         shell.setTransform(shell.getPosition(), angle - (float) (Math.PI / 2));
         shell.setUserData("shell");
+        shell.setBullet(true);
         shell.setLinearVelocity((float) (Math.cos(angle) * velocity), (float) 
                 (Math.sin(angle) * velocity));
         PolygonShape shellShape = new PolygonShape();
