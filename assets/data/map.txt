@@ -1,10 +1,12 @@
-9 5 //length and width of the map
+//length and width of the map
+9 5
+//0 = no obstacles, 1 = ruins, 2 = factory
 00000
-10000
-00000
+01020
+00010
 02000
-00020
+00120
 01100
-00000
-00000
+02001
+10100
 02020

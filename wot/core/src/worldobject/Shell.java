@@ -83,6 +83,7 @@ public class Shell extends WorldObject {
         FixtureDef shellFixtureDef = new FixtureDef();
         shellFixtureDef.shape = shellShape;
         shellFixtureDef.density = 1f;
+        shellFixtureDef.filter.categoryBits = 0x0002;
         
         Fixture obstacleFixture = shell.createFixture(shellFixtureDef);
 

@@ -66,6 +66,7 @@ public class Obstacle extends WorldObject {
         FixtureDef obstacleFixtureDef = new FixtureDef();
         obstacleFixtureDef.shape = obstacleShape;
         obstacleFixtureDef.density = 1f;
+        obstacleFixtureDef.filter.categoryBits = 0x0003;
         
         Fixture obstacleFixture = obstacle.createFixture(obstacleFixtureDef);
 

@@ -12,7 +12,7 @@ public class PlayerTank extends TankObject {
     
     private DesktopInput input;
     private final float forceMultiplier = 18; // actual gameplay value = 6
-    private final float torqueMultiplier = 0.5f; // old value = 0.3f
+    private final float torqueMultiplier = 0.8f;
     
     public PlayerTank(World world, 
             OrthographicCamera camera, GameMap map, Sprite[] sprites, 

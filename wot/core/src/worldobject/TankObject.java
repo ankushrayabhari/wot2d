@@ -247,10 +247,12 @@ public abstract class TankObject extends WorldObject {
         FixtureDef hullFixtureDef = new FixtureDef();
         hullFixtureDef.shape = hullShape;
         hullFixtureDef.density = 1f;
+        hullFixtureDef.filter.categoryBits = 0x0001;
 
         FixtureDef turretFixtureDef = new FixtureDef();
         turretFixtureDef.shape = turretShape;
         turretFixtureDef.density = 1f;
+        turretFixtureDef.filter.categoryBits = 0x0001;
 
         Fixture turretFixture = bodies[1].createFixture(turretFixtureDef);
         

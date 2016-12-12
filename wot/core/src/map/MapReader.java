@@ -19,10 +19,17 @@ public class MapReader {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             if (reader.ready()) {
-                String[] lineTokens = reader.readLine().split(" ");
+                String line = reader.readLine();
+                while (line.startsWith("//") && reader.ready()) {
+                    line = reader.readLine();
+                }
+                String[] lineTokens = line.split(" ");
                 mapValues = new int[Integer.parseInt(lineTokens[0])][Integer.parseInt(lineTokens[1])];
                 for (int i = 0; i < mapValues.length; i++) {
-                    String line = reader.readLine();
+                    line = reader.readLine();
+                    while (line.startsWith("//") && reader.ready()) {
+                        line = reader.readLine();
+                    }
                     for (int j = 0; j < line.length(); j++) {
                         mapValues[i][j] = Integer.parseInt(line.charAt(j) + "");
                     }

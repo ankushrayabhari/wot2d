@@ -72,7 +72,7 @@ public class GameScreen extends ScreenAdapter {
                 playerSprites, input, pixels_per_meter, this);
         worldObjects.add(playerTank);
         tankObjects.add(playerTank);
-        for (int i = 0; i < enemySprites.length; i++) {
+        for (int i = enemySprites.length - 1; i < enemySprites.length; i++) {
             EnemyTank enemy = new EnemyTank(world, camera, map, 
                     enemySprites[i], pixels_per_meter, this, 3000, 1000 + 500 * i);
             worldObjects.add(enemy);

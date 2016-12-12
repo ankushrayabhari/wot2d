@@ -53,6 +53,7 @@ public class Boundary extends WorldObject {
         FixtureDef obstacleFixtureDef = new FixtureDef();
         obstacleFixtureDef.shape = obstacleShape;
         obstacleFixtureDef.density = 1f;
+        obstacleFixtureDef.filter.categoryBits = 0x0004;
         
         Fixture obstacleFixture = boundary.createFixture(obstacleFixtureDef);
 
