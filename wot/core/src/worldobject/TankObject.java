@@ -1,10 +1,13 @@
 package worldobject;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -33,6 +36,7 @@ public abstract class TankObject extends WorldObject {
     private GameMap map;
     private Sprite shellSprite;
     private int health;
+    private ShapeRenderer renderer;
     
     public TankObject(World world, 
             OrthographicCamera camera, GameMap map, Sprite[] sprites, 
@@ -44,6 +48,7 @@ public abstract class TankObject extends WorldObject {
         this.pixels_per_meter = pixels_per_meter;
         this.screen = screen;
         tankSprite = sprites;
+        renderer = new ShapeRenderer();
         Texture shellTexture = new Texture("data/shell.png");
         shellSprite = new Sprite(shellTexture);
         bodyDef = new BodyDef[2];
@@ -300,6 +305,22 @@ public abstract class TankObject extends WorldObject {
                  tankSprite[1].getWidth(),tankSprite[1].getHeight(),tankSprite[1].getScaleX(),tankSprite[1].
                                  getScaleY(),tankSprite[1].getRotation());
             }
+            batch.end();
+            renderer.setProjectionMatrix(camera.combined);
+            renderer.begin(ShapeType.Filled);
+            renderer.setColor(Color.GREEN);
+            int hp = health;
+            if (hp < 0) {
+                hp = 0;
+            }
+            renderer.rect(tankSprite[0].getX(), tankSprite[0].getY() - 40, 
+                    tankSprite[0].getWidth() * (hp / 10f), 2);
+            renderer.setColor(Color.RED);
+            renderer.rect(tankSprite[0].getX() + tankSprite[0].getWidth() 
+                    * hp / 10f, tankSprite[0].getY() - 40, 
+                    tankSprite[0].getWidth() * (10 - hp) / 10f, 2);
+            renderer.end();
+            batch.begin();
         }
     }
 

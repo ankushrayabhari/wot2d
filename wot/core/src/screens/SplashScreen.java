@@ -31,7 +31,7 @@ public class SplashScreen extends ScreenAdapter {
                 Gdx.graphics.getHeight() / 2 - splashImg.getHeight() / 2);
         batch.end();
         if (time > 1) {
-            game.setScreen(game.getGameScreen());
+            game.setScreen(game.getMainMenu());
         }
     }
 

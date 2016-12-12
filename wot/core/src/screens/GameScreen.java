@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.CollisionListener;
 import com.mygdx.game.DesktopInput;
 import com.mygdx.game.WorldOfTanks;
@@ -42,11 +43,15 @@ public class GameScreen extends ScreenAdapter {
     private PlayerTank playerTank;
     private ArrayList<WorldObject> worldObjects;
     private ArrayList<TankObject> tankObjects;
+    private final int numEnemies = 3;
+    private float gameOverTimer = 0;
     Matrix4 debugMatrix;
+    private Skin skin;
     Box2DDebugRenderer debugRenderer;
 
-    public GameScreen(WorldOfTanks t) {
+    public GameScreen(WorldOfTanks t, Skin s) {
         game = t;
+        skin = s;
         batch = new SpriteBatch();
         playerHullImg = new Texture("data/t34hull.png");
         hullSprite = new Sprite(playerHullImg);
@@ -61,7 +66,7 @@ public class GameScreen extends ScreenAdapter {
         
         worldObjects = new ArrayList<WorldObject>();
         Sprite[] playerSprites = {hullSprite, turretSprite};
-        Sprite[][] enemySprites = new Sprite[3][2];
+        Sprite[][] enemySprites = new Sprite[numEnemies][2];
         for (int i = 0; i < enemySprites.length; i++) {
             enemySprites[i] = new Sprite[]{new Sprite(enemyHullImg), 
                     new Sprite(enemyTurretImg)};
@@ -107,11 +112,25 @@ public class GameScreen extends ScreenAdapter {
 
     private void updateWorld(float delta) {
         world.step(1/60f, 8, 5);
+        int numDeadEnemies = 0;
         Iterator<TankObject> tankIter = tankObjects.iterator();
         while (tankIter.hasNext()) {
             TankObject obj = tankIter.next();
             if (obj.getHealth() > 0) {
                 obj.shoot();
+            } else if (obj instanceof EnemyTank) {
+                numDeadEnemies++;
+            } else if (obj instanceof PlayerTank) {
+                gameOverTimer += delta;
+                if (gameOverTimer > 3) {
+                    game.setScreen(new DefeatMenu(game, skin));
+                }
+            }
+        }
+        if (numDeadEnemies >= numEnemies) {
+            gameOverTimer += delta;
+            if (gameOverTimer > 3) {
+                game.setScreen(new VictoryMenu(game, skin));
             }
         }
         Iterator<WorldObject> objectIter = worldObjects.iterator();
@@ -151,6 +170,11 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void dispose() {
         playerHullImg.dispose();
+        enemyHullImg.dispose();
+        playerTurretImg.dispose();
+        enemyTurretImg.dispose();
         world.dispose();
+        batch.dispose();
+        debugRenderer.dispose();
     }
 }
