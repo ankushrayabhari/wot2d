@@ -1,8 +1,14 @@
 package screens;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
@@ -32,10 +38,58 @@ public class GameScreen extends ScreenAdapter {
 
     private final float pixels_per_meter = 50;
     
+    // TODO: 1. save files 2. smoke and explosions 3. aiming reticle + reloading
+    // 4. inaccuracy depending on velocity
+    
+    private class SaveFileReader {
+        
+        private List<WorldObject> list;
+        
+        public SaveFileReader(String fileName) throws IOException {
+            list = new ArrayList<WorldObject>();
+            Sprite[] playerSprites = {playerHullSprite, playerTurretSprite};
+            FileReader fr = new FileReader(fileName);
+            BufferedReader reader = new BufferedReader(fr);
+            while (reader.ready()) {
+                String[] lineTokens = reader.readLine().split(" ");
+                if (lineTokens[0].equals("player_tank")) {
+                    PlayerTank tank = new PlayerTank(world, camera, map, 
+                            playerSprites, input, pixels_per_meter, GameScreen.this,
+                            Float.parseFloat(lineTokens[6]), Float.parseFloat(lineTokens[9]),
+                            Float.parseFloat(lineTokens[12]), Float.parseFloat(lineTokens[15]));
+                    tank.setHealth((int) Float.parseFloat(lineTokens[3]));
+                    list.add(tank);
+                    playerTank = tank;
+                } else if (lineTokens[0].equals("enemy_tank")) {
+                    EnemyTank tank = new EnemyTank(world, camera, map, 
+                            new Sprite[]{new Sprite(enemyHullImg), 
+                            new Sprite(enemyTurretImg)}, pixels_per_meter, GameScreen.this, 
+                            Float.parseFloat(lineTokens[6]), Float.parseFloat(lineTokens[9]),
+                            Float.parseFloat(lineTokens[12]), Float.parseFloat(lineTokens[15]));
+                    tank.setHealth((int) Float.parseFloat(lineTokens[3]));
+                    list.add(tank);
+                } else if (lineTokens[0].equals("shell")) {
+                    Shell shell = new Shell(null, world, camera, map,
+                            new Sprite(shellTexture), pixels_per_meter, 
+                            Float.parseFloat(lineTokens[3]), Float.parseFloat(lineTokens[6]),
+                            Float.parseFloat(lineTokens[9]));
+                    list.add(shell);
+                } 
+            }
+            reader.close();
+            fr.close();
+        }
+        
+        public List<WorldObject> getObjectList() {
+            return list;
+        }
+    }
+    
     private WorldOfTanks game;
     private SpriteBatch batch;
-    private Sprite hullSprite, turretSprite;
-    private Texture playerHullImg, playerTurretImg, enemyHullImg, enemyTurretImg;
+    private Sprite playerHullSprite, playerTurretSprite;
+    private Texture playerHullImg, playerTurretImg, enemyHullImg, 
+        enemyTurretImg, shellTexture;
     private World world;
     private DesktopInput input;
     private OrthographicCamera camera;
@@ -43,8 +97,9 @@ public class GameScreen extends ScreenAdapter {
     private PlayerTank playerTank;
     private ArrayList<WorldObject> worldObjects;
     private ArrayList<TankObject> tankObjects;
-    private final int numEnemies = 3;
+    private int numEnemies = 3;
     private float gameOverTimer = 0;
+    private float saveGameTimer = 0;
     Matrix4 debugMatrix;
     private Skin skin;
     Box2DDebugRenderer debugRenderer;
@@ -54,18 +109,19 @@ public class GameScreen extends ScreenAdapter {
         skin = s;
         batch = new SpriteBatch();
         playerHullImg = new Texture("data/t34hull.png");
-        hullSprite = new Sprite(playerHullImg);
+        playerHullSprite = new Sprite(playerHullImg);
+        shellTexture = new Texture("data/shell.png");
         playerTurretImg = new Texture("data/t34turret.png");
         enemyHullImg = new Texture("data/panzer4hull.png");
         enemyTurretImg = new Texture("data/panzer4turret.png");
-        turretSprite = new Sprite(playerTurretImg);
+        playerTurretSprite = new Sprite(playerTurretImg);
         input = new DesktopInput(t);
         Gdx.input.setInputProcessor(input);
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), 
                 Gdx.graphics.getHeight());
         
         worldObjects = new ArrayList<WorldObject>();
-        Sprite[] playerSprites = {hullSprite, turretSprite};
+        Sprite[] playerSprites = {playerHullSprite, playerTurretSprite};
         Sprite[][] enemySprites = new Sprite[numEnemies][2];
         for (int i = 0; i < enemySprites.length; i++) {
             enemySprites[i] = new Sprite[]{new Sprite(enemyHullImg), 
@@ -102,12 +158,81 @@ public class GameScreen extends ScreenAdapter {
         }
     }
     
+    public GameScreen(WorldOfTanks t, Skin s, String fileName) throws IOException {
+        game = t;
+        skin = s;
+        batch = new SpriteBatch();
+        playerHullImg = new Texture("data/t34hull.png");
+        playerHullSprite = new Sprite(playerHullImg);
+        playerTurretImg = new Texture("data/t34turret.png");
+        shellTexture = new Texture("data/shell.png");
+        enemyHullImg = new Texture("data/panzer4hull.png");
+        enemyTurretImg = new Texture("data/panzer4turret.png");
+        playerTurretSprite = new Sprite(playerTurretImg);
+        input = new DesktopInput(t);
+        Gdx.input.setInputProcessor(input);
+        camera = new OrthographicCamera(Gdx.graphics.getWidth(), 
+                Gdx.graphics.getHeight());
+
+        world = new World(new Vector2(0, 0f), true);
+        world.setContactListener(new CollisionListener());
+        worldObjects = new ArrayList<WorldObject>();
+        tankObjects = new ArrayList<TankObject>();
+        map = new GameMap(this, 12, 6, world, camera, pixels_per_meter);
+        
+        numEnemies = 0;
+        SaveFileReader reader = new SaveFileReader(fileName);
+        List<WorldObject> objects = reader.getObjectList();
+        Iterator<WorldObject> iter = objects.iterator();
+        while (iter.hasNext()) {
+            WorldObject obj = iter.next();
+            if (obj instanceof TankObject) {
+                tankObjects.add((TankObject) obj);
+                if (obj instanceof EnemyTank) {
+                    numEnemies++;
+                }
+            }
+            worldObjects.add(obj);
+        }
+        
+        Sprite[][] enemySprites = new Sprite[numEnemies][2];
+        for (int i = 0; i < enemySprites.length; i++) {
+            enemySprites[i] = new Sprite[]{new Sprite(enemyHullImg), 
+                    new Sprite(enemyTurretImg)};
+        }
+        Iterator<WorldObject> iterator = worldObjects.iterator();
+        while (iterator.hasNext()) {
+            WorldObject wobj = iterator.next();
+            wobj.setupObject();
+        }
+        debugRenderer = new Box2DDebugRenderer();
+    }
+    
     public void addWorldObject(WorldObject wobj) {
         worldObjects.add(wobj);
     }
     
     public PlayerTank getPlayer() {
         return playerTank;
+    }
+    
+    private void saveGame() {
+        try {
+            FileWriter fileWriter = new FileWriter(new File("save" + 
+        System.currentTimeMillis() + ".txt"));
+            BufferedWriter writer = new BufferedWriter(fileWriter);
+            Iterator<WorldObject> objectIter = worldObjects.iterator();
+            while (objectIter.hasNext()) {
+                WorldObject obj = objectIter.next();
+                writer.write(obj.toString());
+                writer.newLine();
+            }
+            writer.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     private void updateWorld(float delta) {
@@ -147,7 +272,11 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         updateWorld(delta);
-
+        if (input.saveFile() && saveGameTimer >= 5) {
+            saveGame();
+            saveGameTimer = 0;
+        }
+        saveGameTimer += delta;
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.position.x = playerTank.getX() + playerTank.getWidth() / 2;

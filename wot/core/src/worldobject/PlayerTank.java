@@ -11,13 +11,22 @@ import screens.GameScreen;
 public class PlayerTank extends TankObject {
     
     private DesktopInput input;
-    private final float forceMultiplier = 18; // actual gameplay value = 6
+    private final float forceMultiplier = 9; // actual gameplay value = 6
     private final float torqueMultiplier = 0.8f;
     
     public PlayerTank(World world, 
             OrthographicCamera camera, GameMap map, Sprite[] sprites, 
             DesktopInput input, float pixels_per_meter, GameScreen screen) {
-        super(world, camera, map, sprites, pixels_per_meter, screen, 1500, 1500);
+        super(world, camera, map, sprites, pixels_per_meter, screen, 1500, 1500, 0, 0);
+        this.input = input;
+        setUserData(getHull(), getTurret());
+    }
+    
+    public PlayerTank(World world, 
+            OrthographicCamera camera, GameMap map, Sprite[] sprites, 
+            DesktopInput input, float pixels_per_meter, GameScreen screen, 
+            float x, float y, float hullAngle, float turretAngle) {
+        super(world, camera, map, sprites, pixels_per_meter, screen, x, y, hullAngle, turretAngle);
         this.input = input;
         setUserData(getHull(), getTurret());
     }
@@ -68,6 +77,11 @@ public class PlayerTank extends TankObject {
     @Override
     public float getAimingAngleInRad() {
         return input.getMouseAngleInRad();
+    }
+    
+    @Override
+    public String toString() {
+        return "player_tank " + super.toString();
     }
 
 }

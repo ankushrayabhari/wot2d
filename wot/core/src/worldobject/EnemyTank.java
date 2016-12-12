@@ -39,8 +39,8 @@ public class EnemyTank extends TankObject {
     
     GameScreen screen;
     PlayerTank player;
-    private final float forceMultiplier = 18; // actual gameplay value = 6
-    private final float torqueMultiplier = 0.5f; // old value = 0.3f
+    private final float forceMultiplier = 9; // actual gameplay value = 6
+    private final float torqueMultiplier = 0.8f; // old value = 0.3f
     private OrthographicCamera camera;
     private World world;
     private RayCaster rayCaster;
@@ -49,7 +49,20 @@ public class EnemyTank extends TankObject {
     public EnemyTank(World world, OrthographicCamera camera, GameMap map, 
             Sprite[] sprites, float pixels_per_meter,
             GameScreen screen, float x, float y) {
-        super(world, camera, map, sprites, pixels_per_meter, screen, x, y);
+        super(world, camera, map, sprites, pixels_per_meter, screen, x, y, 0, 0);
+        this.screen = screen;
+        this.camera = camera;
+        this.world = world;
+        player = screen.getPlayer();
+        setUserData(getHull(), getTurret());
+        rayCaster = new RayCaster();
+    }
+    
+    public EnemyTank(World world, OrthographicCamera camera, GameMap map, 
+            Sprite[] sprites, float pixels_per_meter,
+            GameScreen screen, float x, float y, float hullAngle, float turretAngle) {
+        super(world, camera, map, sprites, pixels_per_meter, screen, x, y, 
+                hullAngle, turretAngle);
         this.screen = screen;
         this.camera = camera;
         this.world = world;
@@ -204,6 +217,11 @@ public class EnemyTank extends TankObject {
             angle %= Math.PI * 2;
         }
         return (float) angle;
+    }
+    
+    @Override
+    public String toString() {
+        return "enemy_tank " + super.toString();
     }
 
 }

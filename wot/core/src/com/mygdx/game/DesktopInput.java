@@ -7,7 +7,8 @@ import com.badlogic.gdx.InputAdapter;
 public class DesktopInput extends InputAdapter {
 
     private static final int[] CONTROLS = new int[] { Input.Keys.W, 
-            Input.Keys.A, Input.Keys.S, Input.Keys.D, Input.Buttons.LEFT };
+            Input.Keys.A, Input.Keys.S, Input.Keys.D, Input.Buttons.LEFT, 
+            Input.Keys.ESCAPE };
 
     private boolean isKeyPressed[] = new boolean[CONTROLS.length];
 
@@ -24,6 +25,10 @@ public class DesktopInput extends InputAdapter {
     
     public boolean isShooting() {
         return isKeyPressed[4];
+    }
+    
+    public boolean saveFile() {
+        return isKeyPressed[5];
     }
     
     public float getMouseAngleInRad() {

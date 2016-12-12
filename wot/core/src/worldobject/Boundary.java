@@ -88,5 +88,10 @@ public class Boundary extends WorldObject {
     public float getWidth() {
         return width;
     }
+    
+    @Override
+    public String toString() {
+        return "boundary";
+    }
 
 }

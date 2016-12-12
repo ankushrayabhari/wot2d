@@ -109,5 +109,10 @@ public class Obstacle extends WorldObject {
     public float getWidth() {
         return sprite.getWidth();
     }
+    
+    @Override
+    public String toString() {
+        return "obstacle " + obstacleType + " x = " + getX() + " y = " + getY();
+    }
 
 }

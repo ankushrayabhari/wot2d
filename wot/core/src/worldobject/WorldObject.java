@@ -37,4 +37,7 @@ public abstract class WorldObject {
     public abstract void drawObject(Batch batch);
     
     public abstract Body getUserData();
+    
+    @Override
+    public abstract String toString();
 }

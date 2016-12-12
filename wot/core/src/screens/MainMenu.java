@@ -1,5 +1,10 @@
 package screens;
 
+import java.awt.FileDialog;
+import java.io.IOException;
+
+import javax.swing.JFrame;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
@@ -49,7 +54,22 @@ public class MainMenu extends ScreenAdapter {
         loadGameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameScreen(game, skin));
+                FileDialog fileChooser = new FileDialog(new JFrame(), 
+                        "Choose a Save File", FileDialog.LOAD);
+                fileChooser.setDirectory(Gdx.files.getLocalStoragePath());
+                fileChooser.setVisible(true);
+                String fileName = fileChooser.getFile();
+                if (fileName == null) {
+                    game.setScreen(new GameScreen(game, skin));
+                } else {
+                    try {
+                        game.setScreen(new GameScreen(game, skin, fileName));
+                        fileChooser.dispose();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
                 loadGameButton.toggle();
             }
         });

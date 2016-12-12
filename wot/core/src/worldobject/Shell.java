@@ -124,4 +124,9 @@ public class Shell extends WorldObject {
         return shell;
     }
 
+    @Override
+    public String toString() {
+        return "shell x = " + getX() + " y = " + getY() + " angle = " + angle;
+    }
+
 }

@@ -40,7 +40,8 @@ public abstract class TankObject extends WorldObject {
     
     public TankObject(World world, 
             OrthographicCamera camera, GameMap map, Sprite[] sprites, 
-            float pixels_per_meter, GameScreen screen, float x, float y) {
+            float pixels_per_meter, GameScreen screen, float x, float y, 
+            float hullAngle, float turretAngle) {
         super(world, camera, map, pixels_per_meter);
         this.world = world;
         this.camera = camera;
@@ -63,6 +64,8 @@ public abstract class TankObject extends WorldObject {
         bodies = new Body[2];
         bodies[0] = hull;
         bodies[1] = turret;
+        bodies[0].setTransform(bodies[0].getPosition(), hullAngle);
+        bodies[1].setTransform(bodies[1].getPosition(), turretAngle);
         RevoluteJointDef jointDef = new RevoluteJointDef();
         jointDef.bodyA = bodies[0];
         jointDef.bodyB = bodies[1];
@@ -88,15 +91,21 @@ public abstract class TankObject extends WorldObject {
     }
     
     public void loseHealth() {
-        health -= 2;
+        if (health > 0) {
+            health -= 2;
+        }
     }
     
     public int getHealth() {
         return health;
     }
     
+    public void setHealth(int hp) {
+        health = hp;
+    }
+    
     public void shoot() {
-        if (isShooting() && timeElapsed > 1f) {
+        if (isShooting() && timeElapsed > 0.6f) {
             timeElapsed = 0;
             float turretDistance = (float) 
                     Math.sqrt(Math.pow(tankSprite[0].getHeight() * (0.5 - 16f / 31), 2) + 
@@ -322,6 +331,12 @@ public abstract class TankObject extends WorldObject {
             renderer.end();
             batch.begin();
         }
+    }
+    
+    @Override
+    public String toString() {
+        return "health = " + health + " hullX = " + getX() + " hullY = " + getY() + " hullAngle = " 
+    + bodies[0].getAngle() + " turretAngle = " + bodies[1].getAngle();
     }
 
 }
