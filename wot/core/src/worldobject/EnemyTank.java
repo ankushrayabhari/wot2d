@@ -78,6 +78,8 @@ public class EnemyTank extends TankObject {
     public float getHullTorque() {
         if (GameMap.withinRenderRange(camera, getX(), getY()) && clearPath()) {
             chase = true;
+        } else {
+            chase = false;
         }
         float finalAngle = (float) ((Math.atan2(player.getY() - getY(), player.getX() - 
                 getX()) + 2 * Math.PI) % (2 * Math.PI));
@@ -187,9 +189,9 @@ public class EnemyTank extends TankObject {
 
     @Override
     public boolean isShooting() {
-//        return (GameMap.withinRenderRange(camera, getX(), getY()) && 
-//                clearPath());
-        return false;
+        return (GameMap.withinRenderRange(camera, getX(), getY()) && 
+                clearPath());
+//        return false;
     }
 
     @Override

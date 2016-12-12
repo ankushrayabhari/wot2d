@@ -32,6 +32,7 @@ public abstract class TankObject extends WorldObject {
     private World world;
     private GameMap map;
     private Sprite shellSprite;
+    private int health;
     
     public TankObject(World world, 
             OrthographicCamera camera, GameMap map, Sprite[] sprites, 
@@ -64,6 +65,7 @@ public abstract class TankObject extends WorldObject {
         jointDef.maxMotorTorque = 5;
 
         RevoluteJoint joint = (RevoluteJoint) world.createJoint(jointDef);
+        health = 10;
     }
     
     
@@ -80,21 +82,29 @@ public abstract class TankObject extends WorldObject {
         return bodies[1];
     }
     
+    public void loseHealth() {
+        health -= 2;
+    }
+    
+    public int getHealth() {
+        return health;
+    }
+    
     public void shoot() {
-        if (isShooting() && timeElapsed > 0.1f) {
+        if (isShooting() && timeElapsed > 1f) {
             timeElapsed = 0;
             float turretDistance = (float) 
                     Math.sqrt(Math.pow(tankSprite[0].getHeight() * (0.5 - 16f / 31), 2) + 
                     Math.pow(tankSprite[0].getWidth() * (0.5 - 36f / 61), 2));
             float x = tankSprite[0].getX() + tankSprite[0].getWidth() / 2 
                     + (float) (turretDistance * Math.cos(bodies[0].getAngle())) 
-                    + tankSprite[1].getWidth() * 48f / 59 * 
+                    + tankSprite[1].getWidth() * 42f / 59 * 
                     (float) (Math.cos(bodies[1].getAngle()));
             float y = tankSprite[0].getY() + tankSprite[0].getHeight() / 2 + (float) 
                     (turretDistance * Math.sin(bodies[0].getAngle()))
-                    + tankSprite[1].getWidth() * 48f / 59 * 
+                    + tankSprite[1].getWidth() * 42f / 59 * 
                     (float) (Math.sin(bodies[1].getAngle()));
-            Shell shell = new Shell(world, camera, map, shellSprite, 
+            Shell shell = new Shell(bodies[0], world, camera, map, shellSprite, 
                     pixels_per_meter, x, y, bodies[1].getAngle());
             shell.setupObject();
             screen.addWorldObject(shell);
@@ -171,8 +181,15 @@ public abstract class TankObject extends WorldObject {
     public void updateObject() {
         timeElapsed += 1/60f;
 //      System.out.println(timeElapsed);
-      float hullTorque = getHullTorque();
-      bodies[0].applyForceToCenter(getHullForceX(), getHullForceY(), true);
+      float hullTorque;
+      if (health <= 0) {
+          hullTorque = 0;
+      } else {
+          hullTorque = getHullTorque();
+      }
+      if (health > 0) {
+          bodies[0].applyForceToCenter(getHullForceX(), getHullForceY(), true);
+      }
       if (hullTorque != 0) {
           if (bodies[0].getAngularVelocity() < 35) {
               bodies[0].applyTorque(hullTorque, true);
@@ -188,7 +205,12 @@ public abstract class TankObject extends WorldObject {
                   - bodies[0].getLinearVelocity().y * bodies[0].getMass() * 
                   9.8f * kFriction, true);
       }
-      float turretTorque = getTurretTorque();
+      float turretTorque;
+      if (health <= 0) {
+          turretTorque = 0;
+      } else {
+          turretTorque = getTurretTorque();
+      }
       if (turretTorque != 0) {
           if (bodies[1].getAngularVelocity() < 39) {
               if (!closeAngle((float) 
@@ -257,6 +279,9 @@ public abstract class TankObject extends WorldObject {
         Fixture turretFixture = bodies[1].createFixture(turretFixtureDef);
         
         Fixture hullFixture = bodies[0].createFixture(hullFixtureDef);
+        
+        turretFixture.setUserData(this);
+        hullFixture.setUserData(this);
 
         hullShape.dispose();
         turretShape.dispose();
@@ -269,10 +294,12 @@ public abstract class TankObject extends WorldObject {
                     tankSprite[0].getOriginY(),
              tankSprite[0].getWidth(),tankSprite[0].getHeight(),tankSprite[0].getScaleX(),tankSprite[0].
                              getScaleY(),tankSprite[0].getRotation());
-            batch.draw(tankSprite[1], tankSprite[1].getX(), tankSprite[1].getY(), 
-                    tankSprite[1].getOriginX(), tankSprite[1].getOriginY(),
-             tankSprite[1].getWidth(),tankSprite[1].getHeight(),tankSprite[1].getScaleX(),tankSprite[1].
-                             getScaleY(),tankSprite[1].getRotation());
+            if (health > 0) {
+                batch.draw(tankSprite[1], tankSprite[1].getX(), tankSprite[1].getY(), 
+                        tankSprite[1].getOriginX(), tankSprite[1].getOriginY(),
+                 tankSprite[1].getWidth(),tankSprite[1].getHeight(),tankSprite[1].getScaleX(),tankSprite[1].
+                                 getScaleY(),tankSprite[1].getRotation());
+            }
         }
     }
 

@@ -17,17 +17,19 @@ public class Shell extends WorldObject {
 
     private float pixels_per_meter;
     private Sprite sprite;
-    private Body shell;
+    private Body shell, originalHull;
     private BodyDef bodyDef;
     private float x, y;
     private OrthographicCamera camera;
     private World world;
     private float angle;
-    private float velocity = 20;
+    private float velocity = 50;
+    private boolean hitObject = false;
     
-    public Shell(World world, OrthographicCamera camera, 
+    public Shell(Body originalHull, World world, OrthographicCamera camera, 
             GameMap map, Sprite sprite, float pixels_per_meter, float x, float y, float angleInRad) {
         super(world, camera, sprite);
+        this.originalHull = originalHull;
         this.sprite = sprite;
         this.world = world;
         this.pixels_per_meter = pixels_per_meter;
@@ -35,6 +37,18 @@ public class Shell extends WorldObject {
         this.angle = angleInRad;
         this.x = x;
         this.y = y;
+    }
+    
+    public void hitObject() {
+        hitObject = true;
+    }
+    
+    public boolean hasHitObject() {
+        return hitObject;
+    }
+    
+    public Body getOriginalHull() {
+        return originalHull;
     }
 
     @Override
@@ -85,7 +99,8 @@ public class Shell extends WorldObject {
         shellFixtureDef.density = 1f;
         shellFixtureDef.filter.categoryBits = 0x0002;
         
-        Fixture obstacleFixture = shell.createFixture(shellFixtureDef);
+        Fixture shellFixture = shell.createFixture(shellFixtureDef);
+        shellFixture.setUserData(this);
 
         shellShape.dispose();
     }

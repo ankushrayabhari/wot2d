@@ -23,6 +23,7 @@ import map.GameMap;
 import tank.TankReader;
 import worldobject.EnemyTank;
 import worldobject.PlayerTank;
+import worldobject.Shell;
 import worldobject.TankObject;
 import worldobject.WorldObject;
 
@@ -72,7 +73,7 @@ public class GameScreen extends ScreenAdapter {
                 playerSprites, input, pixels_per_meter, this);
         worldObjects.add(playerTank);
         tankObjects.add(playerTank);
-        for (int i = enemySprites.length - 1; i < enemySprites.length; i++) {
+        for (int i = 0; i < enemySprites.length; i++) {
             EnemyTank enemy = new EnemyTank(world, camera, map, 
                     enemySprites[i], pixels_per_meter, this, 3000, 1000 + 500 * i);
             worldObjects.add(enemy);
@@ -103,15 +104,21 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void updateWorld(float delta) {
-        Iterator<TankObject> iter = tankObjects.iterator();
-        while (iter.hasNext()) {
-            TankObject obj = iter.next();
-            obj.shoot();
+        Iterator<TankObject> tankIter = tankObjects.iterator();
+        while (tankIter.hasNext()) {
+            TankObject obj = tankIter.next();
+            if (obj.getHealth() > 0) {
+                obj.shoot();
+            }
         }
-        Iterator<WorldObject> iterator = worldObjects.iterator();
-        while (iterator.hasNext()) {
-            WorldObject obj = iterator.next();
+        Iterator<WorldObject> objectIter = worldObjects.iterator();
+        while (objectIter.hasNext()) {
+            WorldObject obj = objectIter.next();
             obj.updateObject();
+            if (obj instanceof Shell && ((Shell) obj).hasHitObject()) {
+                world.destroyBody(obj.getUserData());
+                objectIter.remove();
+            }
         }
         world.step(1/60f, 8, 5);
     }
