@@ -6,6 +6,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.WorldOfTanks;
 
 public class SplashScreen extends ScreenAdapter {
@@ -31,7 +32,8 @@ public class SplashScreen extends ScreenAdapter {
                 Gdx.graphics.getHeight() / 2 - splashImg.getHeight() / 2);
         batch.end();
         if (time > 1) {
-            game.setScreen(game.getMainMenu());
+            game.setScreen(new MainMenu(game, 
+                    new Skin( Gdx.files.internal("ui/uiskin.json" ))));
         }
     }
 

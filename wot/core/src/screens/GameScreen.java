@@ -95,7 +95,7 @@ public class GameScreen extends ScreenAdapter {
     private OrthographicCamera camera;
     private GameMap map;
     private PlayerTank playerTank;
-    private ArrayList<WorldObject> worldObjects;
+    private ArrayList<WorldObject> miscObjects;
     private ArrayList<TankObject> tankObjects;
     private int numEnemies = 3;
     private float gameOverTimer = 0;
@@ -120,7 +120,7 @@ public class GameScreen extends ScreenAdapter {
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), 
                 Gdx.graphics.getHeight());
         
-        worldObjects = new ArrayList<WorldObject>();
+        miscObjects = new ArrayList<WorldObject>();
         Sprite[] playerSprites = {playerHullSprite, playerTurretSprite};
         Sprite[][] enemySprites = new Sprite[numEnemies][2];
         for (int i = 0; i < enemySprites.length; i++) {
@@ -132,20 +132,23 @@ public class GameScreen extends ScreenAdapter {
         world.setContactListener(new CollisionListener());
         playerTank = new PlayerTank(world, camera, map, 
                 playerSprites, input, pixels_per_meter, this);
-        worldObjects.add(playerTank);
         tankObjects.add(playerTank);
         for (int i = 0; i < enemySprites.length; i++) {
             EnemyTank enemy = new EnemyTank(world, camera, map, 
                     enemySprites[i], pixels_per_meter, this, 2000 + (int) 
                     (Math.random() * 2000), 1000 + (500 + (int) (Math.random() 
                             * 100)) * i);
-            worldObjects.add(enemy);
             tankObjects.add(enemy);
         }
         map = new GameMap(this, 12, 6, world, camera, pixels_per_meter);
-        Iterator<WorldObject> iterator = worldObjects.iterator();
-        while (iterator.hasNext()) {
-            WorldObject wobj = iterator.next();
+        Iterator<WorldObject> miscIterator = miscObjects.iterator();
+        while (miscIterator.hasNext()) {
+            WorldObject wobj = miscIterator.next();
+            wobj.setupObject();
+        }
+        Iterator<TankObject> tankIterator = tankObjects.iterator();
+        while (tankIterator.hasNext()) {
+            TankObject wobj = tankIterator.next();
             wobj.setupObject();
         }
         debugRenderer = new Box2DDebugRenderer();
@@ -176,7 +179,7 @@ public class GameScreen extends ScreenAdapter {
 
         world = new World(new Vector2(0, 0f), true);
         world.setContactListener(new CollisionListener());
-        worldObjects = new ArrayList<WorldObject>();
+        miscObjects = new ArrayList<WorldObject>();
         tankObjects = new ArrayList<TankObject>();
         map = new GameMap(this, 12, 6, world, camera, pixels_per_meter);
         
@@ -192,7 +195,6 @@ public class GameScreen extends ScreenAdapter {
                     numEnemies++;
                 }
             }
-            worldObjects.add(obj);
         }
         
         Sprite[][] enemySprites = new Sprite[numEnemies][2];
@@ -200,16 +202,21 @@ public class GameScreen extends ScreenAdapter {
             enemySprites[i] = new Sprite[]{new Sprite(enemyHullImg), 
                     new Sprite(enemyTurretImg)};
         }
-        Iterator<WorldObject> iterator = worldObjects.iterator();
+        Iterator<WorldObject> iterator = miscObjects.iterator();
         while (iterator.hasNext()) {
             WorldObject wobj = iterator.next();
+            wobj.setupObject();
+        }
+        Iterator<TankObject> tankIterator = tankObjects.iterator();
+        while (tankIterator.hasNext()) {
+            TankObject wobj = tankIterator.next();
             wobj.setupObject();
         }
         debugRenderer = new Box2DDebugRenderer();
     }
     
     public void addWorldObject(WorldObject wobj) {
-        worldObjects.add(wobj);
+        miscObjects.add(wobj);
     }
     
     public PlayerTank getPlayer() {
@@ -221,7 +228,7 @@ public class GameScreen extends ScreenAdapter {
             FileWriter fileWriter = new FileWriter(new File("save" + 
         System.currentTimeMillis() + ".wot2dsave"));
             BufferedWriter writer = new BufferedWriter(fileWriter);
-            Iterator<WorldObject> objectIter = worldObjects.iterator();
+            Iterator<WorldObject> objectIter = miscObjects.iterator();
             while (objectIter.hasNext()) {
                 WorldObject obj = objectIter.next();
                 writer.write(obj.toString());
@@ -251,6 +258,7 @@ public class GameScreen extends ScreenAdapter {
                     game.setScreen(new DefeatMenu(game, skin));
                 }
             }
+            obj.updateObject();
         }
         if (numDeadEnemies >= numEnemies) {
             gameOverTimer += delta;
@@ -258,7 +266,7 @@ public class GameScreen extends ScreenAdapter {
                 game.setScreen(new VictoryMenu(game, skin));
             }
         }
-        Iterator<WorldObject> objectIter = worldObjects.iterator();
+        Iterator<WorldObject> objectIter = miscObjects.iterator();
         while (objectIter.hasNext()) {
             WorldObject obj = objectIter.next();
             obj.updateObject();
@@ -272,7 +280,8 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         updateWorld(delta);
-        if (input.saveFile() && saveGameTimer >= 5) {
+        if (input.saveFile() && saveGameTimer >= 5 && 
+                playerTank.getHealth() > 0) {
             saveGame();
             saveGameTimer = 0;
         }
@@ -287,9 +296,14 @@ public class GameScreen extends ScreenAdapter {
                 pixels_per_meter, 0);
         batch.begin();
         map.draw(batch, camera);
-        Iterator<WorldObject> iterator = worldObjects.iterator();
-        while (iterator.hasNext()) {
-            WorldObject obj = iterator.next();
+        Iterator<WorldObject> miscIterator = miscObjects.iterator();
+        while (miscIterator.hasNext()) {
+            WorldObject obj = miscIterator.next();
+            obj.drawObject(batch);
+        }
+        Iterator<TankObject> tankIterator = tankObjects.iterator();
+        while (tankIterator.hasNext()) {
+            WorldObject obj = tankIterator.next();
             obj.drawObject(batch);
         }
         batch.end();

@@ -52,7 +52,12 @@ public class CollisionListener implements ContactListener {
         } else if (customBitB == 0x0002) {
             Shell shell = (Shell) contact.getFixtureB().getUserData();
             shell.hitObject();
-        } 
+        } else if (customBitA == 0x0002 && customBitB == 0x0002) {
+            Shell shellA = (Shell) contact.getFixtureA().getUserData();
+            shellA.hitObject();
+            Shell shellB = (Shell) contact.getFixtureB().getUserData();
+            shellB.hitObject();
+        }
     }
 
 }

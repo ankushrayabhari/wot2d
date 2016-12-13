@@ -104,17 +104,6 @@ public class MainMenu extends ScreenAdapter {
         stage.act();
         stage.draw();
     }
-    
-    @Override
-    public void resume() {
-        Gdx.input.setInputProcessor(stage);
-        if (loadGameButton.isChecked()) {
-            loadGameButton.toggle();
-        }
-        if (newGameButton.isChecked()) {
-            newGameButton.toggle();
-        }
-    }
 
     @Override
     public void dispose() {

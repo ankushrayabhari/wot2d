@@ -31,7 +31,7 @@ public class DefeatMenu extends ScreenAdapter {
         stage = new Stage();
         titleLabel = new Label("Defeat!", skin, "default");
         newGameButton = new TextButton("Try Again", skin);
-        homeButton = new TextButton("Return to Main Menu", skin);
+        homeButton = new TextButton("Return to Main Menu (will lead to bugs)", skin);
         exitButton = new TextButton("Exit", skin);
 
         float centerX = Gdx.graphics.getWidth() / 2;
@@ -53,7 +53,7 @@ public class DefeatMenu extends ScreenAdapter {
         homeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.getMainMenu());
+                game.setScreen(new MainMenu(t, s));
                 homeButton.toggle();
             }
         });

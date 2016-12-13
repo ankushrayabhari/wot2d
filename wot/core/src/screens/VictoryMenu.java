@@ -21,7 +21,7 @@ public class VictoryMenu extends ScreenAdapter {
     public static final int BUTTON_WIDTH = 450;
     public static final int BUTTON_HEIGHT = 105;
     private Label titleLabel;
-    private TextButton newGameButton, loadGameButton, exitButton;
+    private TextButton newGameButton, homeButton, exitButton;
     private Skin skin;
     private Stage stage;
 
@@ -31,7 +31,7 @@ public class VictoryMenu extends ScreenAdapter {
         stage = new Stage();
         titleLabel = new Label("Victory!", skin, "default");
         newGameButton = new TextButton("Play Again", skin);
-        loadGameButton = new TextButton("Return to Main Menu", skin);
+        homeButton = new TextButton("Return to Main Menu (will lead to bugs)", skin);
         exitButton = new TextButton("Exit", skin);
 
         float centerX = Gdx.graphics.getWidth() / 2;
@@ -39,7 +39,7 @@ public class VictoryMenu extends ScreenAdapter {
         float titleX = centerX - titleLabel.getPrefWidth() / 2;
         titleLabel.setPosition(titleX, Gdx.graphics.getHeight() * 3 / 4);
         newGameButton.setPosition(centerButtonX, Gdx.graphics.getHeight() / 2);
-        loadGameButton.setPosition(centerButtonX, Gdx.graphics.getHeight() * 3 / 8);
+        homeButton.setPosition(centerButtonX, Gdx.graphics.getHeight() * 3 / 8);
         exitButton.setPosition(centerButtonX, Gdx.graphics.getHeight() / 4);
 
         // listeners
@@ -50,11 +50,11 @@ public class VictoryMenu extends ScreenAdapter {
                 newGameButton.toggle();
             }
         });
-        loadGameButton.addListener(new ClickListener() {
+        homeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.getMainMenu());
-                loadGameButton.toggle();
+                game.setScreen(new MainMenu(t, s));
+                homeButton.toggle();
             }
         });
         exitButton.addListener(new ClickListener() {
@@ -66,7 +66,7 @@ public class VictoryMenu extends ScreenAdapter {
 
         stage.addActor(titleLabel);
         stage.addActor(newGameButton);
-        stage.addActor(loadGameButton);
+        stage.addActor(homeButton);
         stage.addActor(exitButton);
         Gdx.input.setInputProcessor(stage);
     }
