@@ -219,7 +219,7 @@ public class GameScreen extends ScreenAdapter {
     private void saveGame() {
         try {
             FileWriter fileWriter = new FileWriter(new File("save" + 
-        System.currentTimeMillis() + ".txt"));
+        System.currentTimeMillis() + ".wot2dsave"));
             BufferedWriter writer = new BufferedWriter(fileWriter);
             Iterator<WorldObject> objectIter = worldObjects.iterator();
             while (objectIter.hasNext()) {

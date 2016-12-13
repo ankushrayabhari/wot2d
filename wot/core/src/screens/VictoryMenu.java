@@ -1,5 +1,9 @@
 package screens;
 
+import java.awt.FileDialog;
+
+import javax.swing.JFrame;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,13 +25,13 @@ public class VictoryMenu extends ScreenAdapter {
     private Skin skin;
     private Stage stage;
 
-    public VictoryMenu(WorldOfTanks t, Skin s) {
+    public VictoryMenu(final WorldOfTanks t, final Skin s) {
         game = t;
         skin = s;
         stage = new Stage();
         titleLabel = new Label("Victory!", skin, "default");
         newGameButton = new TextButton("Play Again", skin);
-        loadGameButton = new TextButton("Load Game (aka new game)", skin);
+        loadGameButton = new TextButton("Return to Main Menu", skin);
         exitButton = new TextButton("Exit", skin);
 
         float centerX = Gdx.graphics.getWidth() / 2;
@@ -49,7 +53,7 @@ public class VictoryMenu extends ScreenAdapter {
         loadGameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameScreen(game, skin));
+                game.setScreen(game.getMainMenu());
                 loadGameButton.toggle();
             }
         });

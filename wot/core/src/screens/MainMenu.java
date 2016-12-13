@@ -55,19 +55,29 @@ public class MainMenu extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 FileDialog fileChooser = new FileDialog(new JFrame(), 
-                        "Choose a Save File", FileDialog.LOAD);
+                        "Choose a wot2d Save File", FileDialog.LOAD);
                 fileChooser.setDirectory(Gdx.files.getLocalStoragePath());
                 fileChooser.setVisible(true);
                 String fileName = fileChooser.getFile();
                 if (fileName == null) {
                     game.setScreen(new GameScreen(game, skin));
                 } else {
-                    try {
-                        game.setScreen(new GameScreen(game, skin, fileName));
+                    while (!fileName.endsWith(".wot2dsave")) {
                         fileChooser.dispose();
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        fileChooser = new FileDialog(new JFrame(), 
+                                fileName + " is not a valid wot2d save file", FileDialog.LOAD);
+                        fileChooser.setDirectory(Gdx.files.getLocalStoragePath());
+                        fileChooser.setVisible(true);
+                        fileName = fileChooser.getFile();
+                        if (fileName == null) {
+                            break;
+                        }
+                    }
+                    fileChooser.dispose();
+                    if (fileName != null) {
+                        game.setScreen(new LoadSaveConfirmation(game, skin, fileName));
+                    } else {
+                        game.setScreen(new GameScreen(game, skin));
                     }
                 }
                 loadGameButton.toggle();
@@ -93,6 +103,17 @@ public class MainMenu extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
+    }
+    
+    @Override
+    public void resume() {
+        Gdx.input.setInputProcessor(stage);
+        if (loadGameButton.isChecked()) {
+            loadGameButton.toggle();
+        }
+        if (newGameButton.isChecked()) {
+            newGameButton.toggle();
+        }
     }
 
     @Override

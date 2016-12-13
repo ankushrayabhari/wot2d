@@ -303,7 +303,12 @@ public abstract class TankObject extends WorldObject {
 
     @Override
     public void drawObject(Batch batch) {
-        if (GameMap.withinRenderRange(camera, getX(), getY())) {
+        int extra = 30;
+        if (GameMap.withinRenderRange(camera, getX() - extra, getY() - extra) || 
+                GameMap.withinRenderRange(camera, tankSprite[1].getX() + extra, 
+                        tankSprite[1].getY() - extra) || 
+                GameMap.withinRenderRange(camera, getX() + extra, getY() + extra) || 
+                GameMap.withinRenderRange(camera, getX() - extra, getY() + extra)) {
             batch.draw(tankSprite[0], tankSprite[0].getX(), tankSprite[0].getY(),tankSprite[0].getOriginX(),
                     tankSprite[0].getOriginY(),
              tankSprite[0].getWidth(),tankSprite[0].getHeight(),tankSprite[0].getScaleX(),tankSprite[0].

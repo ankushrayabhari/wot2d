@@ -1,8 +1,6 @@
 package screens;
 
-import java.awt.FileDialog;
-
-import javax.swing.JFrame;
+import java.io.IOException;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
@@ -15,46 +13,51 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.game.WorldOfTanks;
 
-public class DefeatMenu extends ScreenAdapter {
-
+public class LoadSaveConfirmation extends ScreenAdapter {
+   
     private WorldOfTanks game;
     public static final int BUTTON_WIDTH = 450;
     public static final int BUTTON_HEIGHT = 105;
     private Label titleLabel;
-    private TextButton newGameButton, homeButton, exitButton;
+    private TextButton confirmButton, cancelButton, exitButton;
     private Skin skin;
     private Stage stage;
 
-    public DefeatMenu(final WorldOfTanks t, final Skin s) {
+    public LoadSaveConfirmation(final WorldOfTanks t, final Skin s, final String fileName) {
         game = t;
         skin = s;
         stage = new Stage();
-        titleLabel = new Label("Defeat!", skin, "default");
-        newGameButton = new TextButton("Try Again", skin);
-        homeButton = new TextButton("Return to Main Menu", skin);
+        titleLabel = new Label("Load Save Game " + fileName + "?", skin, "default");
+        confirmButton = new TextButton("Confirm", skin);
+        cancelButton = new TextButton("Cancel", skin);
         exitButton = new TextButton("Exit", skin);
 
         float centerX = Gdx.graphics.getWidth() / 2;
         float centerButtonX = Gdx.graphics.getWidth() / 2 - BUTTON_WIDTH / 2;
         float titleX = centerX - titleLabel.getPrefWidth() / 2;
         titleLabel.setPosition(titleX, Gdx.graphics.getHeight() * 3 / 4);
-        newGameButton.setPosition(centerButtonX, Gdx.graphics.getHeight() / 2);
-        homeButton.setPosition(centerButtonX, Gdx.graphics.getHeight() * 3 / 8);
+        confirmButton.setPosition(centerButtonX, Gdx.graphics.getHeight() / 2);
+        cancelButton.setPosition(centerButtonX, Gdx.graphics.getHeight() * 3 / 8);
         exitButton.setPosition(centerButtonX, Gdx.graphics.getHeight() / 4);
 
         // listeners
-        newGameButton.addListener(new ClickListener() {
+        confirmButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameScreen(game, skin));
-                newGameButton.toggle();
+                try {
+                    game.setScreen(new GameScreen(game, skin, fileName));
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                confirmButton.toggle();
             }
         });
-        homeButton.addListener(new ClickListener() {
+        cancelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.getMainMenu());
-                homeButton.toggle();
+                game.setScreen(new MainMenu(t, s));
+                cancelButton.toggle();
             }
         });
         exitButton.addListener(new ClickListener() {
@@ -65,8 +68,8 @@ public class DefeatMenu extends ScreenAdapter {
         });
 
         stage.addActor(titleLabel);
-        stage.addActor(newGameButton);
-        stage.addActor(homeButton);
+        stage.addActor(confirmButton);
+        stage.addActor(cancelButton);
         stage.addActor(exitButton);
         Gdx.input.setInputProcessor(stage);
     }
