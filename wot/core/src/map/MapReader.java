@@ -10,7 +10,7 @@ import com.badlogic.gdx.files.FileHandle;
 
 public class MapReader {
     private FileHandle[] fileNames = { 
-            Gdx.files.local("bin/data/map.txt") };
+            Gdx.files.local("data/map.txt") };
     private int[][] mapValues;
 
     public MapReader() {

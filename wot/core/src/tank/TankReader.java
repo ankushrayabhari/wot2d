@@ -11,11 +11,15 @@ import java.util.StringTokenizer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
+/**
+ * @author Andrew
+ * Class that will be useful for future gameplay features
+ */
 public class TankReader {
 
     private String[] tankNames = { "M4 Sherman" };
     private FileHandle[] fileNames = { 
-            Gdx.files.local("bin/data/sherman.txt") };
+            Gdx.files.local("data/sherman.txt") };
     private int[] tankIntValues = new int[12];
     // front side and rear armor, max forward speed, max reverse speed, 
     // rotate speed hull, rotate speed turret, health 

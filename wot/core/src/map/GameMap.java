@@ -87,7 +87,6 @@ public class GameMap {
     
     public void draw(Batch batch, Camera cam) {
         drawSnow(batch, cam);
-//        drawObstacles(batch, cam);
         drawBoundaries(batch, cam);
     }
     

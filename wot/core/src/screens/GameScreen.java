@@ -48,7 +48,7 @@ public class GameScreen extends ScreenAdapter {
         public SaveFileReader(String fileName) throws IOException {
             list = new ArrayList<WorldObject>();
             Sprite[] playerSprites = {playerHullSprite, playerTurretSprite};
-            FileReader fr = new FileReader(fileName);
+            FileReader fr = new FileReader(Gdx.files.local(fileName).path());
             BufferedReader reader = new BufferedReader(fr);
             while (reader.ready()) {
                 String[] lineTokens = reader.readLine().split(" ");
@@ -152,13 +152,13 @@ public class GameScreen extends ScreenAdapter {
             wobj.setupObject();
         }
         debugRenderer = new Box2DDebugRenderer();
-        try {
-            TankReader tank = new TankReader("M4 Sherman");
-//            System.out.println(tank);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+//        try {
+//            TankReader tank = new TankReader("M4 Sherman");
+////            System.out.println(tank);
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
     }
     
     public GameScreen(WorldOfTanks t, Skin s, String fileName) throws IOException {

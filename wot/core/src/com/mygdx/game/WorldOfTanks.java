@@ -20,9 +20,8 @@ public class WorldOfTanks extends Game {
     public static final String TITLE = "World of Tanks 2D", VERSION = "0.7";
     public static final int GAME_WIDTH = 1600;
     public static final int GAME_HEIGHT = 900;
-    private ScreenAdapter splashScreen;
     private Viewport viewport;
-    private boolean isLoading;
+    
 
 //    public ScreenAdapter getGameScreen() {
 //        return gameScreen;
@@ -34,13 +33,7 @@ public class WorldOfTanks extends Game {
 
     @Override
     public void create() {
-        splashScreen = new SplashScreen(this);
         viewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT);
-        setScreen(splashScreen);
-    }
-
-    @Override
-    public void dispose() {
-        splashScreen.dispose();
+        setScreen(new SplashScreen(this));
     }
 }
