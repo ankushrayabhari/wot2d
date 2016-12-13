@@ -35,7 +35,7 @@ public abstract class TankObject extends WorldObject {
     private World world;
     private GameMap map;
     private Sprite shellSprite;
-    private int health;
+    private int health, maxHealth;
     private ShapeRenderer renderer;
     
     public TankObject(World world, 
@@ -73,7 +73,8 @@ public abstract class TankObject extends WorldObject {
         jointDef.maxMotorTorque = 5;
 
         RevoluteJoint joint = (RevoluteJoint) world.createJoint(jointDef);
-        health = 10;
+        maxHealth = 10;
+        health = maxHealth;
     }
     
     
@@ -100,8 +101,16 @@ public abstract class TankObject extends WorldObject {
         return health;
     }
     
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+    
     public void setHealth(int hp) {
         health = hp;
+    }
+    
+    public void setMaxHealth(int hp) {
+        maxHealth = hp;
     }
     
     public void shoot() {
@@ -328,11 +337,11 @@ public abstract class TankObject extends WorldObject {
                 hp = 0;
             }
             renderer.rect(tankSprite[0].getX(), tankSprite[0].getY() - 40, 
-                    tankSprite[0].getWidth() * (hp / 10f), 2);
+                    tankSprite[0].getWidth() * hp / (getMaxHealth() + 0.0f), 2);
             renderer.setColor(Color.RED);
             renderer.rect(tankSprite[0].getX() + tankSprite[0].getWidth() 
-                    * hp / 10f, tankSprite[0].getY() - 40, 
-                    tankSprite[0].getWidth() * (10 - hp) / 10f, 2);
+                    * (hp + 0.0f) / getMaxHealth(), tankSprite[0].getY() - 40, 
+                    tankSprite[0].getWidth() * (getMaxHealth() - hp + 0.0f) / getMaxHealth(), 2);
             renderer.end();
             batch.begin();
         }

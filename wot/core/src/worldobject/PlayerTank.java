@@ -11,7 +11,7 @@ import screens.GameScreen;
 public class PlayerTank extends TankObject {
     
     private DesktopInput input;
-    private final float forceMultiplier = 9; // actual gameplay value = 6
+    private final float forceMultiplier = 9;
     private final float torqueMultiplier = 0.8f;
     
     public PlayerTank(World world, 
@@ -20,6 +20,8 @@ public class PlayerTank extends TankObject {
         super(world, camera, map, sprites, pixels_per_meter, screen, 1500, 1500, 0, 0);
         this.input = input;
         setUserData(getHull(), getTurret());
+        setHealth(20);
+        setMaxHealth(20);
     }
     
     public PlayerTank(World world, 
@@ -29,6 +31,7 @@ public class PlayerTank extends TankObject {
         super(world, camera, map, sprites, pixels_per_meter, screen, x, y, hullAngle, turretAngle);
         this.input = input;
         setUserData(getHull(), getTurret());
+        setMaxHealth(20);
     }
 
     @Override

@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
@@ -24,10 +24,10 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.CollisionListener;
 import com.mygdx.game.DesktopInput;
+import com.mygdx.game.Explosion;
 import com.mygdx.game.WorldOfTanks;
 
 import map.GameMap;
-import tank.TankReader;
 import worldobject.EnemyTank;
 import worldobject.PlayerTank;
 import worldobject.Shell;
@@ -38,15 +38,14 @@ public class GameScreen extends ScreenAdapter {
 
     private final float pixels_per_meter = 50;
     
-    // TODO: 1. save files 2. smoke and explosions 3. aiming reticle + reloading
-    // 4. inaccuracy depending on velocity
+    // Future expansions: 1. aiming reticle + reloading 2. inaccuracy depending on velocity
     
     private class SaveFileReader {
         
         private List<WorldObject> list;
         
         public SaveFileReader(String fileName) throws IOException {
-            list = new ArrayList<WorldObject>();
+            list = new LinkedList<WorldObject>();
             Sprite[] playerSprites = {playerHullSprite, playerTurretSprite};
             FileReader fr = new FileReader(Gdx.files.local(fileName).path());
             BufferedReader reader = new BufferedReader(fr);
@@ -95,8 +94,9 @@ public class GameScreen extends ScreenAdapter {
     private OrthographicCamera camera;
     private GameMap map;
     private PlayerTank playerTank;
-    private ArrayList<WorldObject> miscObjects;
-    private ArrayList<TankObject> tankObjects;
+    private LinkedList<WorldObject> miscObjects;
+    private LinkedList<TankObject> tankObjects;
+    private LinkedList<Explosion> explosions;
     private int numEnemies = 3;
     private float gameOverTimer = 0;
     private float saveGameTimer = 0;
@@ -115,21 +115,22 @@ public class GameScreen extends ScreenAdapter {
         enemyHullImg = new Texture("data/panzer4hull.png");
         enemyTurretImg = new Texture("data/panzer4turret.png");
         playerTurretSprite = new Sprite(playerTurretImg);
+        
         input = new DesktopInput(t);
         Gdx.input.setInputProcessor(input);
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), 
                 Gdx.graphics.getHeight());
         
-        miscObjects = new ArrayList<WorldObject>();
+        miscObjects = new LinkedList<WorldObject>();
         Sprite[] playerSprites = {playerHullSprite, playerTurretSprite};
         Sprite[][] enemySprites = new Sprite[numEnemies][2];
         for (int i = 0; i < enemySprites.length; i++) {
             enemySprites[i] = new Sprite[]{new Sprite(enemyHullImg), 
                     new Sprite(enemyTurretImg)};
         }
-        tankObjects = new ArrayList<TankObject>();
+        tankObjects = new LinkedList<TankObject>();
         world = new World(new Vector2(0, 0f), true);
-        world.setContactListener(new CollisionListener());
+        world.setContactListener(new CollisionListener(this, pixels_per_meter));
         playerTank = new PlayerTank(world, camera, map, 
                 playerSprites, input, pixels_per_meter, this);
         tankObjects.add(playerTank);
@@ -140,6 +141,7 @@ public class GameScreen extends ScreenAdapter {
                             * 100)) * i);
             tankObjects.add(enemy);
         }
+        explosions = new LinkedList<Explosion>();
         map = new GameMap(this, 12, 6, world, camera, pixels_per_meter);
         Iterator<WorldObject> miscIterator = miscObjects.iterator();
         while (miscIterator.hasNext()) {
@@ -172,15 +174,17 @@ public class GameScreen extends ScreenAdapter {
         enemyHullImg = new Texture("data/panzer4hull.png");
         enemyTurretImg = new Texture("data/panzer4turret.png");
         playerTurretSprite = new Sprite(playerTurretImg);
+        
         input = new DesktopInput(t);
         Gdx.input.setInputProcessor(input);
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), 
                 Gdx.graphics.getHeight());
 
         world = new World(new Vector2(0, 0f), true);
-        world.setContactListener(new CollisionListener());
-        miscObjects = new ArrayList<WorldObject>();
-        tankObjects = new ArrayList<TankObject>();
+        world.setContactListener(new CollisionListener(this, pixels_per_meter));
+        miscObjects = new LinkedList<WorldObject>();
+        tankObjects = new LinkedList<TankObject>();
+        explosions = new LinkedList<Explosion>();
         map = new GameMap(this, 12, 6, world, camera, pixels_per_meter);
         
         numEnemies = 0;
@@ -194,6 +198,8 @@ public class GameScreen extends ScreenAdapter {
                 if (obj instanceof EnemyTank) {
                     numEnemies++;
                 }
+            } else {
+                miscObjects.add(obj);
             }
         }
         
@@ -219,6 +225,10 @@ public class GameScreen extends ScreenAdapter {
         miscObjects.add(wobj);
     }
     
+    public void addExplosion(Explosion explosion) {
+        explosions.add(explosion);
+    }
+    
     public PlayerTank getPlayer() {
         return playerTank;
     }
@@ -228,6 +238,12 @@ public class GameScreen extends ScreenAdapter {
             FileWriter fileWriter = new FileWriter(new File("save" + 
         System.currentTimeMillis() + ".wot2dsave"));
             BufferedWriter writer = new BufferedWriter(fileWriter);
+            Iterator<TankObject> tankIterator = tankObjects.iterator();
+            while (tankIterator.hasNext()) {
+                TankObject wobj = tankIterator.next();
+                writer.write(wobj.toString());
+                writer.newLine();
+            }
             Iterator<WorldObject> objectIter = miscObjects.iterator();
             while (objectIter.hasNext()) {
                 WorldObject obj = objectIter.next();
@@ -306,8 +322,17 @@ public class GameScreen extends ScreenAdapter {
             WorldObject obj = tankIterator.next();
             obj.drawObject(batch);
         }
+        Iterator<Explosion> explosionIter = explosions.iterator();
+        while (explosionIter.hasNext()) {
+            Explosion ex = explosionIter.next();
+            if (ex.getCounter() > 72) {
+                explosionIter.remove();
+            } else {
+                ex.draw(batch);
+            }
+        }
         batch.end();
-        debugRenderer.render(world, debugMatrix);
+//        debugRenderer.render(world, debugMatrix); debugging purposes
     }
 
     @Override
