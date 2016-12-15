@@ -1,17 +1,18 @@
 package com.ankushrayabhari.game.screens;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.ankushrayabhari.game.CollisionListener;
+import com.ankushrayabhari.game.DesktopInput;
+import com.ankushrayabhari.game.Explosion;
+import com.ankushrayabhari.game.WorldOfTanks;
+import com.ankushrayabhari.game.map.GameMap;
+import com.ankushrayabhari.game.worldobject.EnemyTank;
+import com.ankushrayabhari.game.worldobject.PlayerTank;
+import com.ankushrayabhari.game.worldobject.Shell;
+import com.ankushrayabhari.game.worldobject.TankObject;
+import com.ankushrayabhari.game.worldobject.WorldObject;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,29 +23,26 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.ankushrayabhari.game.CollisionListener;
-import com.ankushrayabhari.game.DesktopInput;
-import com.ankushrayabhari.game.Explosion;
-import com.ankushrayabhari.game.WorldOfTanks;
 
-import com.ankushrayabhari.game.map.GameMap;
-import com.ankushrayabhari.game.worldobject.EnemyTank;
-import com.ankushrayabhari.game.worldobject.PlayerTank;
-import com.ankushrayabhari.game.worldobject.Shell;
-import com.ankushrayabhari.game.worldobject.TankObject;
-import com.ankushrayabhari.game.worldobject.WorldObject;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GameScreen extends ScreenAdapter {
 
     private final float pixels_per_meter = 50;
-    
-    // Future expansions: 1. aiming reticle + reloading 2. inaccuracy depending on velocity
     
     private class SaveFileReader {
         
         private List<WorldObject> list;
         
         public SaveFileReader(String fileName) throws IOException {
+            System.out.println(fileName);
             list = new LinkedList<WorldObject>();
             Sprite[] playerSprites = {playerHullSprite, playerTurretSprite};
             FileReader fr = new FileReader(Gdx.files.local(fileName).path());
@@ -235,8 +233,8 @@ public class GameScreen extends ScreenAdapter {
     
     private void saveGame() {
         try {
-            FileWriter fileWriter = new FileWriter(new File("save" + 
-        System.currentTimeMillis() + ".wot2dsave"));
+            FileHandle file = Gdx.files.local("save" + System.currentTimeMillis() + ".wot2dsave");
+            Writer fileWriter = file.writer(false);
             BufferedWriter writer = new BufferedWriter(fileWriter);
             Iterator<TankObject> tankIterator = tankObjects.iterator();
             while (tankIterator.hasNext()) {

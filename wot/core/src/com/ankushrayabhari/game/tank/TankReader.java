@@ -1,15 +1,12 @@
 package com.ankushrayabhari.game.tank;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.StringTokenizer;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * @author Andrew
@@ -19,7 +16,7 @@ public class TankReader {
 
     private String[] tankNames = { "M4 Sherman" };
     private FileHandle[] fileNames = { 
-            Gdx.files.local("data/sherman.txt") };
+            Gdx.files.internal("data/sherman.txt") };
     private int[] tankIntValues = new int[12];
     // front side and rear armor, max forward speed, max reverse speed, 
     // rotate speed hull, rotate speed turret, health 

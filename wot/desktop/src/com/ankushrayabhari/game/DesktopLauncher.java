@@ -1,8 +1,7 @@
-package com.ankushrayabhari.game.desktop;
+package com.ankushrayabhari.game;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.ankushrayabhari.game.WorldOfTanks;
 
 public class DesktopLauncher {
 

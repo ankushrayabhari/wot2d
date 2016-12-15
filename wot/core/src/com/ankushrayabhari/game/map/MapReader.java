@@ -1,23 +1,19 @@
 package com.ankushrayabhari.game.map;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 public class MapReader {
-    private FileHandle[] fileNames = { 
-            Gdx.files.local("data/map.txt") };
+    private FileHandle fileNames;
     private int[][] mapValues;
 
     public MapReader() {
-        int fileIndex = 0;
-        File file = fileNames[fileIndex].file();
+        fileNames = Gdx.files.internal("data/map.txt");
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader = fileNames.reader(8192);
             if (reader.ready()) {
                 String line = reader.readLine();
                 while (line.startsWith("//") && reader.ready()) {
